@@ -1,3 +1,110 @@
 #centralwidget {
 	border-image: url(:/Resources/background.png);
 }
+
+/* Toggle buttons - URL and HTTP */
+#btnURL, #btnHTTP {
+	background-color: transparent;
+	border: none;
+	color: #808080;
+	font-size: 14px;
+	padding: 4px 8px;
+	text-align: left;
+	font-weight: bold;
+}
+
+/* Active/Checked state - green text with underline */
+#btnURL:checked, #btnHTTP:checked {
+	color: #00C853;
+	background-color: transparent;
+	border: none;
+	border-bottom: 2px solid #00C853;
+}
+
+/* Hover state */
+#btnURL:hover, #btnHTTP:hover {
+	color: #00C853;
+}
+
+/* Scan button - dark green with white text */
+#btnScan {
+	background-color: #00C853;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	padding: 8px 24px;
+	font-size: 14px;
+	font-weight: bold;
+	min-width: 80px;
+}
+
+#btnScan:hover {
+	background-color: #00B248;
+}
+
+#btnScan:pressed {
+	background-color: #009640;
+}
+
+/* Tool button - icon button style */
+#btnTool {
+	background-color: transparent;
+	border: none;
+	padding: 4px 8px;
+	min-width: 24px;
+	max-width: 24px;
+	min-height: 30px;
+}
+
+#btnTool:hover {
+	background-color: rgba(0, 0, 0, 0.05);
+	border-radius: 4px;
+}
+
+/* Settings button - icon button style */
+#btnSetting {
+	background-color: transparent;
+	border: none;
+	padding: 4px 8px;
+	min-width: 24px;
+	max-width: 24px;
+	min-height: 30px;
+}
+
+#btnSetting:hover {
+	background-color: rgba(0, 0, 0, 0.05);
+	border-radius: 4px;
+}
+
+/* Input widget container - default gray border (matches inactive toggle button) */
+#widgetInput {
+	border: 2px solid #808080;
+	border-radius: 4px;
+	background-color: white;
+	padding: 2px;
+}
+
+/* Input widget container - green border when input is focused */
+#widgetInput[hasFocus="true"] {
+	border: 2px solid #00C853;
+}
+
+/* URL input field */
+#edtURL {
+	border: none;
+	background-color: transparent;
+	padding: 8px 12px;
+	font-size: 14px;
+}
+
+#edtURL:focus {
+	border: none;
+	outline: none;
+	background-color: transparent;
+}
+
+#labelLogo {
+	color: #00C853;
+	font-size: 32px;
+	font-weight: bold;
+}
