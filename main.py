@@ -8,7 +8,7 @@ from mainwindow import MainWindow
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon(":/Resources/app.ico"))
+    app.setWindowIcon(QIcon(":/Resources/app.png"))
 
     key = "ProtCyberUltraScanner"
     shared = QSharedMemory(key)

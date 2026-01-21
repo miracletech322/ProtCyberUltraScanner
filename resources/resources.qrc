@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="Resources">
+    <file>app.png</file>
     <file>app.ico</file>
+    <file>background.png</file>
+    <file>frontwindow.qss</file>
+    <file>mainwindow.qss</file>
   </qresource>
 </RCC>
