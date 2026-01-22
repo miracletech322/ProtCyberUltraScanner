@@ -20,6 +20,8 @@ class SettingWindow(QWidget):
         self.setup_proxy_settings_save()
         self.setup_authentication_checkboxes()
         self.setup_authentication_settings_save()
+        self.setup_http_defaults()
+        self.setup_http_settings_save()
         self.load_settings()
         self.load_stylesheet()
     
@@ -214,6 +216,45 @@ class SettingWindow(QWidget):
         
         self.save_all_settings(settings)
     
+    def setup_http_defaults(self):
+        """Set default values for HTTP tab fields"""
+        # Set default values (will be overridden by load_settings if saved values exist)
+        self.ui.spnHTimeout.setValue(60)
+        self.ui.spnHParallel.setValue(4)
+        self.ui.spnHMaxRequest.setValue(5)
+        self.ui.edtHUserAgent.setText("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.3")
+        self.ui.edtAdditionalCookies.setPlainText("")
+        self.ui.edtAdditionalHTTP.setPlainText("Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\nAccept-Language: en-US,en;q=0.5")
+    
+    def setup_http_settings_save(self):
+        """Connect HTTP field changes to save settings automatically"""
+        self.ui.spnHTimeout.valueChanged.connect(self.save_http_settings)
+        self.ui.spnHParallel.valueChanged.connect(self.save_http_settings)
+        self.ui.spnHMaxRequest.valueChanged.connect(self.save_http_settings)
+        self.ui.edtHUserAgent.textChanged.connect(self.save_http_settings)
+        self.ui.edtAdditionalCookies.textChanged.connect(self.save_http_settings)
+        self.ui.edtAdditionalHTTP.textChanged.connect(self.save_http_settings)
+    
+    def save_http_settings(self):
+        """Save HTTP settings to JSON file"""
+        # Don't save during loading
+        if self._loading_settings:
+            return
+        
+        settings = self.load_all_settings()
+        
+        # Update HTTP settings
+        settings["http"] = {
+            "timeout": self.ui.spnHTimeout.value(),
+            "parallel": self.ui.spnHParallel.value(),
+            "max_request": self.ui.spnHMaxRequest.value(),
+            "user_agent": self.ui.edtHUserAgent.text(),
+            "additional_cookies": self.ui.edtAdditionalCookies.toPlainText(),
+            "additional_http": self.ui.edtAdditionalHTTP.toPlainText()
+        }
+        
+        self.save_all_settings(settings)
+    
     def save_proxy_settings(self):
         """Save proxy settings to JSON file"""
         # Don't save during loading
@@ -286,6 +327,21 @@ class SettingWindow(QWidget):
             # Apply checkbox states (this will enable/disable fields appropriately)
             self.on_auth_http_toggled()
             self.on_auth_manual_toggled()
+        
+        # Load HTTP settings
+        if "http" in settings:
+            http_settings = settings["http"]
+            
+            # Load HTTP field values
+            self.ui.spnHTimeout.setValue(http_settings.get("timeout", 60))
+            self.ui.spnHParallel.setValue(http_settings.get("parallel", 4))
+            self.ui.spnHMaxRequest.setValue(http_settings.get("max_request", 5))
+            self.ui.edtHUserAgent.setText(http_settings.get("user_agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.3"))
+            self.ui.edtAdditionalCookies.setPlainText(http_settings.get("additional_cookies", ""))
+            self.ui.edtAdditionalHTTP.setPlainText(http_settings.get("additional_http", "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\nAccept-Language: en-US,en;q=0.5"))
+        else:
+            # If no saved settings, apply defaults
+            self.setup_http_defaults()
         
         # TODO: Add loading for other tab settings here as needed
         

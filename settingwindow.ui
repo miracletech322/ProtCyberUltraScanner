@@ -832,9 +832,9 @@
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_11">
                  <item>
-                  <widget class="QLabel" name="labelHHTTP">
+                  <widget class="QLabel" name="labelHTimeout">
                    <property name="text">
-                    <string>HTTP:</string>
+                    <string>Time out (seconds):</string>
                    </property>
                   </widget>
                  </item>
@@ -864,7 +864,7 @@
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <item>
-                  <widget class="QSpinBox" name="spnHHTTP"/>
+                  <widget class="QSpinBox" name="spnHTimeout"/>
                  </item>
                  <item>
                   <widget class="QSpinBox" name="spnHParallel"/>
@@ -902,7 +902,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QPlainTextEdit" name="edtAdditionalCookies"/>
+            <widget class="QPlainTextEdit" name="edtAdditionalCookies">
+             <property name="placeholderText">
+              <string>Name1=Value1; domain=site.com; path=/</string>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QLabel" name="labelHAdditionalHTTP">
@@ -943,12 +947,18 @@
                    <property name="text">
                     <string>Maximum Depth:</string>
                    </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="QCheckBox" name="checkCMaxCount">
                    <property name="text">
                     <string>Maximum Count:</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -957,6 +967,9 @@
                    <property name="text">
                     <string>File Exclution:</string>
                    </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                 </layout>
@@ -964,7 +977,11 @@
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_15">
                  <item>
-                  <widget class="QSpinBox" name="spnCMaxDepth"/>
+                  <widget class="QSpinBox" name="spnCMaxDepth">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
                  </item>
                  <item>
                   <widget class="QSpinBox" name="spnCMaxCount"/>
@@ -980,6 +997,9 @@
               <widget class="QCheckBox" name="checkCEvaluate">
                <property name="text">
                 <string>Evaluate JavaScripts Using Chromium</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
