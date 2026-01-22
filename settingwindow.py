@@ -32,6 +32,7 @@ class SettingWindow(QWidget):
         self.setup_test_vectors_defaults()
         self.setup_test_vectors_settings_save()
         self.setup_technologies_table()
+        self.setup_test_profiles()
         self.load_settings()
         self.load_stylesheet()
     
@@ -540,6 +541,304 @@ class SettingWindow(QWidget):
         
         self.save_all_settings(settings)
     
+    def setup_test_profiles(self):
+        """Setup test profile functionality"""
+        # Define all test checkboxes
+        self.test_checkboxes = [
+            "checkTestSQLInjection", "checkTestBlindSQLInjection", "checkTestTimeBasedSQLInjection",
+            "checkTestExpressionLanguageInjection", "checkTestInsecureDirectObjectReference",
+            "checkTestOSCommandExecution", "checkTestUnvalidatedRedirections", "checkTestOld",
+            "checkTestHiddenResource", "checkTestSensitiveDataDisclosure",
+            "checkTestVulnerableJavaScriptLibraryUsage", "checkTestDirectoryListing",
+            "checkTestRemoteFileInclusion", "checkTestLocalFileInclusion",
+            "checkTestServerSideRequestForgery", "checkTestPathTraversal",
+            "checkTestCrossSiteScripting", "checkTestInsecureDeserialization",
+            "checkTestBufferOverflow", "checkTestFuzzing", "checkTestUnicodeTransformationIssue",
+            "checkTestTestforRobots", "checkTestCheckSitemap", "checkTestPassive",
+            "checkTestWordPress", "checkTestDrupal", "checkTestJoomla",
+            "checkTestApacheHTTPD", "checkTestApacheStruts", "checkTestApacheTomcat",
+            "checkTestNginx", "checkTestMicrosoftIIS", "checkTestPHP",
+            "checkTestBruteForce", "checkTestSSLTLS", "checkTestTheShellShockBug",
+            "checkTestHTTPHeaderSecurity", "checkTestTheHTTPHeadersAttacks",
+            "checkTestDenialServiceAttacks"
+        ]
+        
+        # Define profile mappings based on the screenshot data
+        self.profile_mappings = {
+            "Default": {
+                "checkTestSQLInjection": True, "checkTestBlindSQLInjection": True,
+                "checkTestTimeBasedSQLInjection": True, "checkTestExpressionLanguageInjection": True,
+                "checkTestInsecureDirectObjectReference": True, "checkTestOSCommandExecution": True,
+                "checkTestUnvalidatedRedirections": True, "checkTestOld": True,
+                "checkTestHiddenResource": True, "checkTestSensitiveDataDisclosure": True,
+                "checkTestVulnerableJavaScriptLibraryUsage": True, "checkTestDirectoryListing": True,
+                "checkTestRemoteFileInclusion": True, "checkTestLocalFileInclusion": True,
+                "checkTestServerSideRequestForgery": True, "checkTestPathTraversal": True,
+                "checkTestCrossSiteScripting": True, "checkTestInsecureDeserialization": True,
+                "checkTestBufferOverflow": True, "checkTestFuzzing": True,
+                "checkTestUnicodeTransformationIssue": True, "checkTestTestforRobots": True,
+                "checkTestCheckSitemap": True, "checkTestPassive": True,
+                "checkTestWordPress": True, "checkTestDrupal": True, "checkTestJoomla": True,
+                "checkTestApacheHTTPD": True, "checkTestApacheStruts": True,
+                "checkTestApacheTomcat": True, "checkTestNginx": True,
+                "checkTestMicrosoftIIS": True, "checkTestPHP": True,
+                "checkTestBruteForce": True, "checkTestSSLTLS": True,
+                "checkTestTheShellShockBug": True, "checkTestHTTPHeaderSecurity": True,
+                "checkTestTheHTTPHeadersAttacks": True, "checkTestDenialServiceAttacks": False
+            },
+            "No Test": {
+                "checkTestSQLInjection": False, "checkTestBlindSQLInjection": False,
+                "checkTestTimeBasedSQLInjection": False, "checkTestExpressionLanguageInjection": False,
+                "checkTestInsecureDirectObjectReference": False, "checkTestOSCommandExecution": False,
+                "checkTestUnvalidatedRedirections": False, "checkTestOld": False,
+                "checkTestHiddenResource": False, "checkTestSensitiveDataDisclosure": False,
+                "checkTestVulnerableJavaScriptLibraryUsage": False, "checkTestDirectoryListing": False,
+                "checkTestRemoteFileInclusion": False, "checkTestLocalFileInclusion": False,
+                "checkTestServerSideRequestForgery": False, "checkTestPathTraversal": False,
+                "checkTestCrossSiteScripting": False, "checkTestInsecureDeserialization": False,
+                "checkTestBufferOverflow": False, "checkTestFuzzing": False,
+                "checkTestUnicodeTransformationIssue": False, "checkTestTestforRobots": False,
+                "checkTestCheckSitemap": False, "checkTestPassive": False,
+                "checkTestWordPress": False, "checkTestDrupal": False, "checkTestJoomla": False,
+                "checkTestApacheHTTPD": False, "checkTestApacheStruts": False,
+                "checkTestApacheTomcat": False, "checkTestNginx": False,
+                "checkTestMicrosoftIIS": False, "checkTestPHP": False,
+                "checkTestBruteForce": False, "checkTestSSLTLS": False,
+                "checkTestTheShellShockBug": False, "checkTestHTTPHeaderSecurity": False,
+                "checkTestTheHTTPHeadersAttacks": False, "checkTestDenialServiceAttacks": False
+            },
+            "OWASP Top 10": {
+                "checkTestSQLInjection": True, "checkTestBlindSQLInjection": True,
+                "checkTestTimeBasedSQLInjection": True, "checkTestExpressionLanguageInjection": True,
+                "checkTestInsecureDirectObjectReference": True, "checkTestOSCommandExecution": True,
+                "checkTestUnvalidatedRedirections": True, "checkTestOld": False,
+                "checkTestHiddenResource": False, "checkTestSensitiveDataDisclosure": True,
+                "checkTestVulnerableJavaScriptLibraryUsage": True, "checkTestDirectoryListing": False,
+                "checkTestRemoteFileInclusion": True, "checkTestLocalFileInclusion": True,
+                "checkTestServerSideRequestForgery": True, "checkTestPathTraversal": True,
+                "checkTestCrossSiteScripting": True, "checkTestInsecureDeserialization": True,
+                "checkTestBufferOverflow": False, "checkTestFuzzing": False,
+                "checkTestUnicodeTransformationIssue": True, "checkTestTestforRobots": False,
+                "checkTestCheckSitemap": True, "checkTestPassive": False,
+                "checkTestWordPress": True, "checkTestDrupal": True, "checkTestJoomla": True,
+                "checkTestApacheHTTPD": True, "checkTestApacheStruts": True,
+                "checkTestApacheTomcat": True, "checkTestNginx": True,
+                "checkTestMicrosoftIIS": True, "checkTestPHP": True,
+                "checkTestBruteForce": True, "checkTestSSLTLS": True,
+                "checkTestTheShellShockBug": True, "checkTestHTTPHeaderSecurity": False,
+                "checkTestTheHTTPHeadersAttacks": True, "checkTestDenialServiceAttacks": False
+            },
+            "Passive": {
+                "checkTestSQLInjection": False, "checkTestBlindSQLInjection": False,
+                "checkTestTimeBasedSQLInjection": False, "checkTestExpressionLanguageInjection": False,
+                "checkTestInsecureDirectObjectReference": False, "checkTestOSCommandExecution": False,
+                "checkTestUnvalidatedRedirections": False, "checkTestOld": False,
+                "checkTestHiddenResource": False, "checkTestSensitiveDataDisclosure": True,
+                "checkTestVulnerableJavaScriptLibraryUsage": True, "checkTestDirectoryListing": False,
+                "checkTestRemoteFileInclusion": False, "checkTestLocalFileInclusion": False,
+                "checkTestServerSideRequestForgery": False, "checkTestPathTraversal": False,
+                "checkTestCrossSiteScripting": False, "checkTestInsecureDeserialization": False,
+                "checkTestBufferOverflow": False, "checkTestFuzzing": False,
+                "checkTestUnicodeTransformationIssue": False, "checkTestTestforRobots": True,
+                "checkTestCheckSitemap": True, "checkTestPassive": True,
+                "checkTestWordPress": False, "checkTestDrupal": False, "checkTestJoomla": False,
+                "checkTestApacheHTTPD": False, "checkTestApacheStruts": False,
+                "checkTestApacheTomcat": False, "checkTestNginx": False,
+                "checkTestMicrosoftIIS": False, "checkTestPHP": False,
+                "checkTestBruteForce": False, "checkTestSSLTLS": False,
+                "checkTestTheShellShockBug": False, "checkTestHTTPHeaderSecurity": True,
+                "checkTestTheHTTPHeadersAttacks": False, "checkTestDenialServiceAttacks": False
+            },
+            "Headers Security": {
+                "checkTestSQLInjection": False, "checkTestBlindSQLInjection": False,
+                "checkTestTimeBasedSQLInjection": False, "checkTestExpressionLanguageInjection": False,
+                "checkTestInsecureDirectObjectReference": False, "checkTestOSCommandExecution": False,
+                "checkTestUnvalidatedRedirections": False, "checkTestOld": False,
+                "checkTestHiddenResource": False, "checkTestSensitiveDataDisclosure": False,
+                "checkTestVulnerableJavaScriptLibraryUsage": False, "checkTestDirectoryListing": False,
+                "checkTestRemoteFileInclusion": False, "checkTestLocalFileInclusion": False,
+                "checkTestServerSideRequestForgery": False, "checkTestPathTraversal": False,
+                "checkTestCrossSiteScripting": False, "checkTestInsecureDeserialization": False,
+                "checkTestBufferOverflow": False, "checkTestFuzzing": False,
+                "checkTestUnicodeTransformationIssue": False, "checkTestTestforRobots": False,
+                "checkTestCheckSitemap": True, "checkTestPassive": False,
+                "checkTestWordPress": False, "checkTestDrupal": False, "checkTestJoomla": False,
+                "checkTestApacheHTTPD": False, "checkTestApacheStruts": False,
+                "checkTestApacheTomcat": False, "checkTestNginx": False,
+                "checkTestMicrosoftIIS": False, "checkTestPHP": False,
+                "checkTestBruteForce": False, "checkTestSSLTLS": False,
+                "checkTestTheShellShockBug": False, "checkTestHTTPHeaderSecurity": True,
+                "checkTestTheHTTPHeadersAttacks": False, "checkTestDenialServiceAttacks": False
+            },
+            "Web Server Security": {
+                "checkTestSQLInjection": False, "checkTestBlindSQLInjection": False,
+                "checkTestTimeBasedSQLInjection": False, "checkTestExpressionLanguageInjection": False,
+                "checkTestInsecureDirectObjectReference": False, "checkTestOSCommandExecution": False,
+                "checkTestUnvalidatedRedirections": False, "checkTestOld": False,
+                "checkTestHiddenResource": False, "checkTestSensitiveDataDisclosure": False,
+                "checkTestVulnerableJavaScriptLibraryUsage": False, "checkTestDirectoryListing": False,
+                "checkTestRemoteFileInclusion": False, "checkTestLocalFileInclusion": False,
+                "checkTestServerSideRequestForgery": False, "checkTestPathTraversal": False,
+                "checkTestCrossSiteScripting": False, "checkTestInsecureDeserialization": False,
+                "checkTestBufferOverflow": False, "checkTestFuzzing": False,
+                "checkTestUnicodeTransformationIssue": False, "checkTestTestforRobots": True,
+                "checkTestCheckSitemap": True, "checkTestPassive": False,
+                "checkTestWordPress": False, "checkTestDrupal": False, "checkTestJoomla": False,
+                "checkTestApacheHTTPD": True, "checkTestApacheStruts": True,
+                "checkTestApacheTomcat": True, "checkTestNginx": True,
+                "checkTestMicrosoftIIS": True, "checkTestPHP": True,
+                "checkTestBruteForce": False, "checkTestSSLTLS": False,
+                "checkTestTheShellShockBug": False, "checkTestHTTPHeaderSecurity": False,
+                "checkTestTheHTTPHeadersAttacks": False, "checkTestDenialServiceAttacks": False
+            },
+            "High Impact": {
+                "checkTestSQLInjection": True, "checkTestBlindSQLInjection": True,
+                "checkTestTimeBasedSQLInjection": True, "checkTestExpressionLanguageInjection": True,
+                "checkTestInsecureDirectObjectReference": True, "checkTestOSCommandExecution": True,
+                "checkTestUnvalidatedRedirections": True, "checkTestOld": False,
+                "checkTestHiddenResource": False, "checkTestSensitiveDataDisclosure": False,
+                "checkTestVulnerableJavaScriptLibraryUsage": False, "checkTestDirectoryListing": False,
+                "checkTestRemoteFileInclusion": True, "checkTestLocalFileInclusion": True,
+                "checkTestServerSideRequestForgery": True, "checkTestPathTraversal": True,
+                "checkTestCrossSiteScripting": True, "checkTestInsecureDeserialization": True,
+                "checkTestBufferOverflow": False, "checkTestFuzzing": False,
+                "checkTestUnicodeTransformationIssue": True, "checkTestTestforRobots": False,
+                "checkTestCheckSitemap": True, "checkTestPassive": False,
+                "checkTestWordPress": True, "checkTestDrupal": True, "checkTestJoomla": True,
+                "checkTestApacheHTTPD": True, "checkTestApacheStruts": True,
+                "checkTestApacheTomcat": True, "checkTestNginx": True,
+                "checkTestMicrosoftIIS": True, "checkTestPHP": True,
+                "checkTestBruteForce": True, "checkTestSSLTLS": False,
+                "checkTestTheShellShockBug": True, "checkTestHTTPHeaderSecurity": False,
+                "checkTestTheHTTPHeadersAttacks": False, "checkTestDenialServiceAttacks": False
+            },
+            "Custom": {}  # Custom will be loaded from settings
+        }
+        
+        # Flag to prevent profile change when applying profile
+        self._applying_profile = False
+        
+        # Connect profile combo box
+        self.ui.cmbTestProfile.currentIndexChanged.connect(self.on_test_profile_changed)
+        
+        # Connect all checkboxes to switch to Custom mode when changed
+        for checkbox_name in self.test_checkboxes:
+            checkbox = getattr(self.ui, checkbox_name, None)
+            if checkbox:
+                checkbox.toggled.connect(self.on_test_checkbox_changed)
+    
+    def on_test_profile_changed(self, index):
+        """Handle test profile selection change"""
+        if self._applying_profile or self._loading_settings:
+            return
+        
+        profile_name = self.ui.cmbTestProfile.currentText()
+        
+        # Only apply if not Custom (Custom is managed separately)
+        if profile_name != "Custom":
+            self._applying_profile = True
+            self.apply_test_profile(profile_name)
+            self._applying_profile = False
+            # Save only the current profile selection, don't update Custom
+            self.save_test_profiles(update_custom=False)
+    
+    def on_test_checkbox_changed(self, checked):
+        """Handle test checkbox change - switch to Custom mode"""
+        if self._applying_profile or self._loading_settings:
+            return
+        
+        # If not already in Custom mode, switch to it
+        if self.ui.cmbTestProfile.currentText() != "Custom":
+            # Temporarily block signals to avoid triggering profile change
+            self.ui.cmbTestProfile.blockSignals(True)
+            custom_index = self.ui.cmbTestProfile.findText("Custom")
+            if custom_index >= 0:
+                self.ui.cmbTestProfile.setCurrentIndex(custom_index)
+            # Unblock signals
+            self.ui.cmbTestProfile.blockSignals(False)
+        
+        # Save current checkbox status to Custom mode in JSON
+        self.save_test_profiles(update_custom=True)
+    
+    def apply_test_profile(self, profile_name):
+        """Apply a test profile to all checkboxes"""
+        if profile_name == "Custom":
+            # Custom mode should not be applied here - it's managed separately
+            return
+        
+        if profile_name not in self.profile_mappings:
+            return
+        
+        profile = self.profile_mappings[profile_name]
+        
+        # Temporarily block checkbox signals to avoid switching to Custom
+        for checkbox_name in self.test_checkboxes:
+            checkbox = getattr(self.ui, checkbox_name, None)
+            if checkbox:
+                checkbox.blockSignals(True)
+        
+        # Apply profile states
+        for checkbox_name, checked in profile.items():
+            checkbox = getattr(self.ui, checkbox_name, None)
+            if checkbox:
+                checkbox.setChecked(checked)
+        
+        # Unblock checkbox signals
+        for checkbox_name in self.test_checkboxes:
+            checkbox = getattr(self.ui, checkbox_name, None)
+            if checkbox:
+                checkbox.blockSignals(False)
+    
+    def save_test_profiles(self, update_custom=True):
+        """Save all test profile states to JSON file
+        
+        Args:
+            update_custom: If True, update Custom profile with current checkbox states.
+                          If False, only save current profile selection without updating Custom.
+        """
+        if self._loading_settings:
+            return
+        
+        settings = self.load_all_settings()
+        
+        # Initialize test_profiles if it doesn't exist
+        if "test_profiles" not in settings:
+            settings["test_profiles"] = {}
+        
+        test_profiles = settings.get("test_profiles", {})
+        
+        # Preserve existing Custom profile if we're not updating it
+        existing_custom = test_profiles.get("Custom", {})
+        
+        # Only update Custom profile if explicitly requested (when user changes checkboxes)
+        if update_custom:
+            # Get current checkbox states
+            current_checkbox_states = {}
+            for checkbox_name in self.test_checkboxes:
+                checkbox = getattr(self.ui, checkbox_name, None)
+                if checkbox:
+                    current_checkbox_states[checkbox_name] = checkbox.isChecked()
+            
+            # Save current checkbox states to Custom mode
+            test_profiles["Custom"] = current_checkbox_states.copy()
+        else:
+            # Preserve existing Custom profile - don't overwrite it
+            if existing_custom:
+                test_profiles["Custom"] = existing_custom
+        
+        # Preserve other profile states if they exist, otherwise use defaults
+        for profile_name in self.profile_mappings.keys():
+            if profile_name != "Custom":
+                if profile_name not in test_profiles:
+                    test_profiles[profile_name] = self.profile_mappings[profile_name].copy()
+        
+        # Save current profile selection
+        current_profile = self.ui.cmbTestProfile.currentText()
+        test_profiles["_current_profile"] = current_profile
+        
+        settings["test_profiles"] = test_profiles
+        self.save_all_settings(settings)
+    
     def save_proxy_settings(self):
         """Save proxy settings to JSON file"""
         # Don't save during loading
@@ -724,6 +1023,60 @@ class SettingWindow(QWidget):
                 
                 self.ui.tableTech.setItem(row_count, 0, QTableWidgetItem(tech_type))
                 self.ui.tableTech.setItem(row_count, 1, QTableWidgetItem(tech_url))
+        
+        # Load test profiles settings
+        if "test_profiles" in settings:
+            test_profiles = settings["test_profiles"]
+            
+            # Update profile mappings with saved states
+            for profile_name, profile_state in test_profiles.items():
+                if profile_name == "_current_profile":
+                    continue
+                if profile_name in self.profile_mappings:
+                    if profile_name == "Custom":
+                        # Custom mode gets its saved state
+                        self.profile_mappings["Custom"] = profile_state
+                    else:
+                        # Other profiles keep their defaults but we can update if needed
+                        self.profile_mappings[profile_name].update(profile_state)
+            
+            # Load current profile selection
+            current_profile = test_profiles.get("_current_profile", "Default")
+            profile_index = self.ui.cmbTestProfile.findText(current_profile)
+            if profile_index >= 0:
+                self.ui.cmbTestProfile.setCurrentIndex(profile_index)
+            
+            # Apply the loaded profile
+            self._applying_profile = True
+            # Temporarily block checkbox signals
+            for checkbox_name in self.test_checkboxes:
+                checkbox = getattr(self.ui, checkbox_name, None)
+                if checkbox:
+                    checkbox.blockSignals(True)
+            
+            if current_profile == "Custom" and "Custom" in test_profiles:
+                # Apply Custom state directly
+                custom_state = test_profiles["Custom"]
+                for checkbox_name, checked in custom_state.items():
+                    checkbox = getattr(self.ui, checkbox_name, None)
+                    if checkbox:
+                        checkbox.setChecked(checked)
+            else:
+                # Apply the selected profile
+                self.apply_test_profile(current_profile)
+            
+            # Unblock checkbox signals
+            for checkbox_name in self.test_checkboxes:
+                checkbox = getattr(self.ui, checkbox_name, None)
+                if checkbox:
+                    checkbox.blockSignals(False)
+            
+            self._applying_profile = False
+        else:
+            # If no saved settings, apply Default profile
+            self._applying_profile = True
+            self.apply_test_profile("Default")
+            self._applying_profile = False
         
         # TODO: Add loading for other tab settings here as needed
         
