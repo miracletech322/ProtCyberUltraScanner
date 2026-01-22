@@ -1,7 +1,7 @@
 import json
 import os
 from PySide6.QtCore import QFile, QTextStream
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget, QMessageBox, QTableWidgetItem, QAbstractItemView
 from ui_settingwindow import Ui_SettingWindow
 
 class SettingWindow(QWidget):
@@ -12,6 +12,9 @@ class SettingWindow(QWidget):
         self.main_window = None  # Will be set by MainWindow
         self.settings_file = os.path.join(os.path.dirname(__file__), "settings.json")
         self._loading_settings = False  # Flag to prevent saving during load
+        self.ui.tableTech.verticalHeader().setVisible(False)
+        self.ui.tableTech.setColumnWidth(0, 250)
+        self.ui.tableTech.setColumnWidth(1, 500)
         self.setup_tab_widget()
         self.setup_toggle_buttons()
         self.setup_back_button()
@@ -28,6 +31,7 @@ class SettingWindow(QWidget):
         self.setup_form_inputs_settings_save()
         self.setup_test_vectors_defaults()
         self.setup_test_vectors_settings_save()
+        self.setup_technologies_table()
         self.load_settings()
         self.load_stylesheet()
     
@@ -450,6 +454,92 @@ class SettingWindow(QWidget):
         
         self.save_all_settings(settings)
     
+    def setup_technologies_table(self):
+        """Setup Technologies table add/delete functionality"""
+        # Connect add button
+        self.ui.btnTechAdd.clicked.connect(self.on_tech_add_clicked)
+        
+        # Connect delete button
+        self.ui.btnTechDelete.clicked.connect(self.on_tech_delete_clicked)
+        
+        # Set table properties
+        self.ui.tableTech.setColumnCount(2)
+        self.ui.tableTech.setHorizontalHeaderLabels(["Type", "URL"])
+        self.ui.tableTech.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.ui.tableTech.setSelectionMode(QAbstractItemView.SingleSelection)
+    
+    def on_tech_add_clicked(self):
+        """Handle add button click - add row with cmbTech and edtTechURL values"""
+        tech_type = self.ui.cmbTech.currentText()
+        tech_url = self.ui.edtTechURL.text()
+        
+        # Validate that URL is not empty
+        if not tech_url.strip():
+            QMessageBox.warning(self, "Warning", "Please enter a URL.")
+            return
+        
+        # Add row to table
+        row_count = self.ui.tableTech.rowCount()
+        self.ui.tableTech.insertRow(row_count)
+        
+        # Set items
+        self.ui.tableTech.setItem(row_count, 0, QTableWidgetItem(tech_type))
+        self.ui.tableTech.setItem(row_count, 1, QTableWidgetItem(tech_url))
+        
+        # Initialize (clear) cmbTech and edtTechURL
+        self.ui.cmbTech.setCurrentIndex(0)  # Reset to first item
+        self.ui.edtTechURL.clear()
+        
+        # Save settings
+        self.save_technologies_settings()
+    
+    def on_tech_delete_clicked(self):
+        """Handle delete button click - confirm and delete selected row"""
+        current_row = self.ui.tableTech.currentRow()
+        
+        if current_row < 0:
+            QMessageBox.warning(self, "Warning", "Please select a row to delete.")
+            return
+        
+        # Confirm deletion
+        reply = QMessageBox.question(
+            self,
+            "Confirm Delete",
+            "Are you sure you want to delete this row?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply == QMessageBox.Yes:
+            self.ui.tableTech.removeRow(current_row)
+            # Save settings
+            self.save_technologies_settings()
+    
+    def save_technologies_settings(self):
+        """Save technologies table data to JSON file"""
+        # Don't save during loading
+        if self._loading_settings:
+            return
+        
+        settings = self.load_all_settings()
+        
+        # Collect all rows from table
+        technologies = []
+        for row in range(self.ui.tableTech.rowCount()):
+            tech_type_item = self.ui.tableTech.item(row, 0)
+            tech_url_item = self.ui.tableTech.item(row, 1)
+            
+            if tech_type_item and tech_url_item:
+                technologies.append({
+                    "type": tech_type_item.text(),
+                    "url": tech_url_item.text()
+                })
+        
+        # Update technologies settings
+        settings["technologies"] = technologies
+        
+        self.save_all_settings(settings)
+    
     def save_proxy_settings(self):
         """Save proxy settings to JSON file"""
         # Don't save during loading
@@ -616,6 +706,24 @@ class SettingWindow(QWidget):
         else:
             # If no saved settings, apply defaults
             self.setup_test_vectors_defaults()
+        
+        # Load technologies settings
+        if "technologies" in settings:
+            technologies = settings["technologies"]
+            
+            # Clear existing rows
+            self.ui.tableTech.setRowCount(0)
+            
+            # Load technologies into table
+            for tech in technologies:
+                row_count = self.ui.tableTech.rowCount()
+                self.ui.tableTech.insertRow(row_count)
+                
+                tech_type = tech.get("type", "")
+                tech_url = tech.get("url", "")
+                
+                self.ui.tableTech.setItem(row_count, 0, QTableWidgetItem(tech_type))
+                self.ui.tableTech.setItem(row_count, 1, QTableWidgetItem(tech_url))
         
         # TODO: Add loading for other tab settings here as needed
         

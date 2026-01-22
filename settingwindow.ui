@@ -1605,6 +1605,13 @@
               <widget class="QLineEdit" name="edtTechURL"/>
              </item>
              <item>
+              <widget class="QPushButton" name="btnTechAdd">
+               <property name="text">
+                <string>Add</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="btnTechDelete">
                <property name="text">
                 <string>Delete</string>
@@ -1614,17 +1621,18 @@
             </layout>
            </item>
            <item>
-            <spacer name="verticalSpacer_7">
-             <property name="orientation">
-              <enum>Qt::Orientation::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
+            <widget class="QTableWidget" name="tableTech">
+             <column>
+              <property name="text">
+               <string>Type</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>URL</string>
+              </property>
+             </column>
+            </widget>
            </item>
           </layout>
          </item>
