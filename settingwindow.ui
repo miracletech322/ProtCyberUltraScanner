@@ -864,13 +864,25 @@
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <item>
-                  <widget class="QSpinBox" name="spnHTimeout"/>
+                  <widget class="QSpinBox" name="spnHTimeout">
+                   <property name="maximum">
+                    <number>999999999</number>
+                   </property>
+                  </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spnHParallel"/>
+                  <widget class="QSpinBox" name="spnHParallel">
+                   <property name="maximum">
+                    <number>999999999</number>
+                   </property>
+                  </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spnHMaxRequest"/>
+                  <widget class="QSpinBox" name="spnHMaxRequest">
+                   <property name="maximum">
+                    <number>999999999</number>
+                   </property>
+                  </widget>
                  </item>
                  <item>
                   <widget class="QLineEdit" name="edtHUserAgent"/>
@@ -981,10 +993,17 @@
                    <property name="enabled">
                     <bool>true</bool>
                    </property>
+                   <property name="maximum">
+                    <number>999999999</number>
+                   </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spnCMaxCount"/>
+                  <widget class="QSpinBox" name="spnCMaxCount">
+                   <property name="maximum">
+                    <number>999999999</number>
+                   </property>
+                  </widget>
                  </item>
                  <item>
                   <widget class="QLineEdit" name="edtCFileExclution"/>

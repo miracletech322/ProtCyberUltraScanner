@@ -22,6 +22,9 @@ class SettingWindow(QWidget):
         self.setup_authentication_settings_save()
         self.setup_http_defaults()
         self.setup_http_settings_save()
+        self.setup_crawler_defaults()
+        self.setup_crawler_checkboxes()
+        self.setup_crawler_settings_save()
         self.load_settings()
         self.load_stylesheet()
     
@@ -255,6 +258,107 @@ class SettingWindow(QWidget):
         
         self.save_all_settings(settings)
     
+    def setup_crawler_defaults(self):
+        """Set default values for Crawler tab fields"""
+        # Set default values (will be overridden by load_settings if saved values exist)
+        self.ui.spnCMaxDepth.setValue(5)
+        self.ui.spnCMaxCount.setValue(70000)
+        self.ui.edtCFileExclution.setText("*.7z,*.a3c,*.a52,*.aac,*.ac3,*.ace,*.acsm,*.am,*.apk,*.asf,*.asx,*.avi,*.azw3,*.azw4,*.bin,*.bmp,*.bz2,*.cab,*.cmd,*.conf,*.css,*.csv,*.divx,*.djvu,*.doc,*.docx,*.dts,*.dv,*.engine,*.eot,*.eps,*.epub,*.exe,*.fla,*.flac,*.flv,*.fvi,*.gif,*.gxf,*.gz,*.ice,*.ico,*.inc,*.info,*.install,*.iso,*.jar,*.jpe,*.jpeg,*.jpg,*.lang,*.m1v,*.m2ts,*.m2v,*.m4a,*.m4p,*.m4v,*.mdb,*.mid,*.midi,*.mka,*.mkv,*.mod,*.mov,*.movie,*.mp,*.mp1,*.mp2,*.mp3,*.mp4,*.mpeg,*.mpeg1,*.mpeg2,*.mpeg4,*.mpg,*.mpga,*.mpp,*.mpt,*.msi,*.mts,*.mtv,*.mxf,*.oga,*.ogg,*.ogm,*.ogv,*.ogx,*.oma,*.opus,*.pac,*.pcx,*.pdf,*.pgm,*.png,*.ppsx,*.ppt,*.pptx,*.profile,*.ps,*.psd,*.ram,*.rar,*.rb,*.res,*.rmf,*.rpm,*.save,*.scss,*.sh,*.spx,*.sql,*.svg,*.svn-base,*.svn-work,*.swf,*.tar,*.tbz2,*.tgz,*.tif,*.tiff,*.ts,*.tta,*.ttf,*.uff,*.vob,*.vox,*.vro,*.wav,*.wbmp,*.webm,*.wma,*.wmv,*.woff,*.xls,*.xlsx,*.xm,*.zip,*.abw,*.arc,*.azw,*.bz,*.csh,*.ics,*.mpkg,*.odp,*.ods,*.odt,*.otf,*.rtf,*.txt,*.vsd,*.weba,*.webp,*.woff2,*.xul,*.3gp,*.3g2,*.xcf,*.map")
+        self.ui.edtCURLExclution.setPlainText("*sign?out*\n*log?out*\n*exit*\n*kill*\n*delete*\n*remove*\n*/.svn/+\n*/.git/+\n*/phpMyAdmin/+\n*/pgadmin/+\n*/roundcube/+\n*/%/%/%/%/%/%/%/%/%/%/%/%")
+    
+    def setup_crawler_checkboxes(self):
+        """Setup crawler checkboxes to enable/disable crawler fields"""
+        # Set checkboxes to checked by default
+        self.ui.checkCMaxDepth.setChecked(True)
+        self.ui.checkCMaxCount.setChecked(True)
+        self.ui.checkCFileExclution.setChecked(True)
+        self.ui.checkCEvaluate.setChecked(True)
+        
+        # Connect checkboxes to enable/disable fields
+        self.ui.checkCMaxDepth.toggled.connect(self.on_crawler_max_depth_toggled)
+        self.ui.checkCMaxCount.toggled.connect(self.on_crawler_max_count_toggled)
+        self.ui.checkCFileExclution.toggled.connect(self.on_crawler_file_exclusion_toggled)
+        
+        # Connect scope combo box to handle visibility
+        self.ui.cmbCScope.currentIndexChanged.connect(self.on_crawler_scope_changed)
+        
+        # Set initial state based on checkbox states
+        self.on_crawler_max_depth_toggled()
+        self.on_crawler_max_count_toggled()
+        self.on_crawler_file_exclusion_toggled()
+        self.on_crawler_scope_changed()
+    
+    def on_crawler_max_depth_toggled(self):
+        """Handle checkCMaxDepth toggle - enable/disable max depth field"""
+        checked = self.ui.checkCMaxDepth.isChecked()
+        self.ui.spnCMaxDepth.setEnabled(checked)
+    
+    def on_crawler_max_count_toggled(self):
+        """Handle checkCMaxCount toggle - enable/disable max count field"""
+        checked = self.ui.checkCMaxCount.isChecked()
+        self.ui.spnCMaxCount.setEnabled(checked)
+    
+    def on_crawler_file_exclusion_toggled(self):
+        """Handle checkCFileExclution toggle - enable/disable file exclusion field"""
+        checked = self.ui.checkCFileExclution.isChecked()
+        self.ui.edtCFileExclution.setEnabled(checked)
+    
+    def on_crawler_scope_changed(self):
+        """Handle cmbCScope change - show/hide fields based on scope selection"""
+        scope_text = self.ui.cmbCScope.currentText()
+        is_smart = (scope_text == "Smart")
+        
+        # When Smart is selected: show checkboxes, hide regex fields
+        # When Manual is selected: hide checkboxes, show regex fields
+        self.ui.checkCScanSubDomain.setVisible(is_smart)
+        self.ui.checkCScanTargetURL.setVisible(is_smart)
+        self.ui.labelCScopeRegex.setVisible(not is_smart)
+        self.ui.edtCScopeRegex.setVisible(not is_smart)
+    
+    def setup_crawler_settings_save(self):
+        """Connect crawler field changes to save settings automatically"""
+        self.ui.spnCMaxDepth.valueChanged.connect(self.save_crawler_settings)
+        self.ui.spnCMaxCount.valueChanged.connect(self.save_crawler_settings)
+        self.ui.edtCFileExclution.textChanged.connect(self.save_crawler_settings)
+        self.ui.edtCURLExclution.textChanged.connect(self.save_crawler_settings)
+        self.ui.edtCScopeRegex.textChanged.connect(self.save_crawler_settings)
+        # Also save when checkboxes change
+        self.ui.checkCMaxDepth.toggled.connect(self.save_crawler_settings)
+        self.ui.checkCMaxCount.toggled.connect(self.save_crawler_settings)
+        self.ui.checkCFileExclution.toggled.connect(self.save_crawler_settings)
+        self.ui.checkCEvaluate.toggled.connect(self.save_crawler_settings)
+        self.ui.checkCScanSubDomain.toggled.connect(self.save_crawler_settings)
+        self.ui.checkCScanTargetURL.toggled.connect(self.save_crawler_settings)
+        # Note: cmbCScope.currentIndexChanged is connected in setup_crawler_checkboxes for visibility
+        # We also need to save when scope changes - connect to save (both handlers will be called)
+        self.ui.cmbCScope.currentIndexChanged.connect(self.save_crawler_settings)
+    
+    def save_crawler_settings(self):
+        """Save crawler settings to JSON file"""
+        # Don't save during loading
+        if self._loading_settings:
+            return
+        
+        settings = self.load_all_settings()
+        
+        # Update crawler settings
+        settings["crawler"] = {
+            "max_depth_enabled": self.ui.checkCMaxDepth.isChecked(),
+            "max_depth": self.ui.spnCMaxDepth.value(),
+            "max_count_enabled": self.ui.checkCMaxCount.isChecked(),
+            "max_count": self.ui.spnCMaxCount.value(),
+            "file_exclusion_enabled": self.ui.checkCFileExclution.isChecked(),
+            "file_exclusion": self.ui.edtCFileExclution.text(),
+            "evaluate_enabled": self.ui.checkCEvaluate.isChecked(),
+            "url_exclusion": self.ui.edtCURLExclution.toPlainText(),
+            "scan_subdomain": self.ui.checkCScanSubDomain.isChecked(),
+            "scan_target_url": self.ui.checkCScanTargetURL.isChecked(),
+            "scope": self.ui.cmbCScope.currentText(),
+            "scope_regex": self.ui.edtCScopeRegex.text()
+        }
+        
+        self.save_all_settings(settings)
+    
     def save_proxy_settings(self):
         """Save proxy settings to JSON file"""
         # Don't save during loading
@@ -342,6 +446,44 @@ class SettingWindow(QWidget):
         else:
             # If no saved settings, apply defaults
             self.setup_http_defaults()
+        
+        # Load crawler settings
+        if "crawler" in settings:
+            crawler_settings = settings["crawler"]
+            
+            # Load checkbox states (default to True for checkCMaxDepth, checkCMaxCount, checkCFileExclution, checkCEvaluate)
+            self.ui.checkCMaxDepth.setChecked(crawler_settings.get("max_depth_enabled", True))
+            self.ui.checkCMaxCount.setChecked(crawler_settings.get("max_count_enabled", True))
+            self.ui.checkCFileExclution.setChecked(crawler_settings.get("file_exclusion_enabled", True))
+            self.ui.checkCEvaluate.setChecked(crawler_settings.get("evaluate_enabled", True))
+            self.ui.checkCScanSubDomain.setChecked(crawler_settings.get("scan_subdomain", False))
+            self.ui.checkCScanTargetURL.setChecked(crawler_settings.get("scan_target_url", False))
+            
+            # Load field values
+            self.ui.spnCMaxDepth.setValue(crawler_settings.get("max_depth", 5))
+            self.ui.spnCMaxCount.setValue(crawler_settings.get("max_count", 70000))
+            self.ui.edtCFileExclution.setText(crawler_settings.get("file_exclusion", "*.7z,*.a3c,*.a52,*.aac,*.ac3,*.ace,*.acsm,*.am,*.apk,*.asf,*.asx,*.avi,*.azw3,*.azw4,*.bin,*.bmp,*.bz2,*.cab,*.cmd,*.conf,*.css,*.csv,*.divx,*.djvu,*.doc,*.docx,*.dts,*.dv,*.engine,*.eot,*.eps,*.epub,*.exe,*.fla,*.flac,*.flv,*.fvi,*.gif,*.gxf,*.gz,*.ice,*.ico,*.inc,*.info,*.install,*.iso,*.jar,*.jpe,*.jpeg,*.jpg,*.lang,*.m1v,*.m2ts,*.m2v,*.m4a,*.m4p,*.m4v,*.mdb,*.mid,*.midi,*.mka,*.mkv,*.mod,*.mov,*.movie,*.mp,*.mp1,*.mp2,*.mp3,*.mp4,*.mpeg,*.mpeg1,*.mpeg2,*.mpeg4,*.mpg,*.mpga,*.mpp,*.mpt,*.msi,*.mts,*.mtv,*.mxf,*.oga,*.ogg,*.ogm,*.ogv,*.ogx,*.oma,*.opus,*.pac,*.pcx,*.pdf,*.pgm,*.png,*.ppsx,*.ppt,*.pptx,*.profile,*.ps,*.psd,*.ram,*.rar,*.rb,*.res,*.rmf,*.rpm,*.save,*.scss,*.sh,*.spx,*.sql,*.svg,*.svn-base,*.svn-work,*.swf,*.tar,*.tbz2,*.tgz,*.tif,*.tiff,*.ts,*.tta,*.ttf,*.uff,*.vob,*.vox,*.vro,*.wav,*.wbmp,*.webm,*.wma,*.wmv,*.woff,*.xls,*.xlsx,*.xm,*.zip,*.abw,*.arc,*.azw,*.bz,*.csh,*.ics,*.mpkg,*.odp,*.ods,*.odt,*.otf,*.rtf,*.txt,*.vsd,*.weba,*.webp,*.woff2,*.xul,*.3gp,*.3g2,*.xcf,*.map"))
+            self.ui.edtCURLExclution.setPlainText(crawler_settings.get("url_exclusion", "*sign?out*\n*log?out*\n*exit*\n*kill*\n*delete*\n*remove*\n*/.svn/+\n*/.git/+\n*/phpMyAdmin/+\n*/pgadmin/+\n*/roundcube/+\n*/%/%/%/%/%/%/%/%/%/%/%/%"))
+            self.ui.edtCScopeRegex.setText(crawler_settings.get("scope_regex", ""))
+            
+            # Load scope combo box
+            scope_text = crawler_settings.get("scope", "Smart")
+            index = self.ui.cmbCScope.findText(scope_text)
+            if index >= 0:
+                self.ui.cmbCScope.setCurrentIndex(index)
+            
+            # Apply checkbox states (this will enable/disable fields appropriately)
+            self.on_crawler_max_depth_toggled()
+            self.on_crawler_max_count_toggled()
+            self.on_crawler_file_exclusion_toggled()
+            
+            # Apply scope visibility
+            self.on_crawler_scope_changed()
+        else:
+            # If no saved settings, apply defaults
+            self.setup_crawler_defaults()
+            # Apply scope visibility for defaults
+            self.on_crawler_scope_changed()
         
         # TODO: Add loading for other tab settings here as needed
         
