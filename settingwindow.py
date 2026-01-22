@@ -18,6 +18,8 @@ class SettingWindow(QWidget):
         self.setup_advanced_settings()
         self.setup_proxy_radio_buttons()
         self.setup_proxy_settings_save()
+        self.setup_authentication_checkboxes()
+        self.setup_authentication_settings_save()
         self.load_settings()
         self.load_stylesheet()
     
@@ -158,6 +160,60 @@ class SettingWindow(QWidget):
         self.ui.radProHTTP.toggled.connect(self.save_proxy_settings)
         self.ui.radProSOCKS.toggled.connect(self.save_proxy_settings)
     
+    def setup_authentication_checkboxes(self):
+        """Setup authentication checkboxes to enable/disable authentication fields"""
+        # Set initial state: all fields disabled by default
+        self.ui.edtAuthUsername.setEnabled(False)
+        self.ui.edtAuthPassword.setEnabled(False)
+        self.ui.btnAuthLogin.setEnabled(False)
+        
+        # Connect checkAuthHTTP to enable/disable username and password fields
+        self.ui.checkAuthHTTP.toggled.connect(self.on_auth_http_toggled)
+        
+        # Connect checkAuthManual to enable/disable login button
+        self.ui.checkAuthManual.toggled.connect(self.on_auth_manual_toggled)
+        
+        # Set initial state based on checkbox states
+        self.on_auth_http_toggled()
+        self.on_auth_manual_toggled()
+    
+    def on_auth_http_toggled(self):
+        """Handle checkAuthHTTP toggle - enable/disable username and password fields"""
+        checked = self.ui.checkAuthHTTP.isChecked()
+        self.ui.edtAuthUsername.setEnabled(checked)
+        self.ui.edtAuthPassword.setEnabled(checked)
+    
+    def on_auth_manual_toggled(self):
+        """Handle checkAuthManual toggle - enable/disable login button"""
+        checked = self.ui.checkAuthManual.isChecked()
+        self.ui.btnAuthLogin.setEnabled(checked)
+    
+    def setup_authentication_settings_save(self):
+        """Connect authentication field changes to save settings automatically"""
+        self.ui.edtAuthUsername.textChanged.connect(self.save_authentication_settings)
+        self.ui.edtAuthPassword.textChanged.connect(self.save_authentication_settings)
+        # Also save when checkboxes change
+        self.ui.checkAuthHTTP.toggled.connect(self.save_authentication_settings)
+        self.ui.checkAuthManual.toggled.connect(self.save_authentication_settings)
+    
+    def save_authentication_settings(self):
+        """Save authentication settings to JSON file"""
+        # Don't save during loading
+        if self._loading_settings:
+            return
+        
+        settings = self.load_all_settings()
+        
+        # Update authentication settings
+        settings["authentication"] = {
+            "http_enabled": self.ui.checkAuthHTTP.isChecked(),
+            "manual_enabled": self.ui.checkAuthManual.isChecked(),
+            "username": self.ui.edtAuthUsername.text(),
+            "password": self.ui.edtAuthPassword.text()
+        }
+        
+        self.save_all_settings(settings)
+    
     def save_proxy_settings(self):
         """Save proxy settings to JSON file"""
         # Don't save during loading
@@ -214,6 +270,22 @@ class SettingWindow(QWidget):
             
             # Update enabled state based on proxy type
             self.on_proxy_radio_toggled()
+        
+        # Load authentication settings
+        if "authentication" in settings:
+            auth_settings = settings["authentication"]
+            
+            # Load checkbox states
+            self.ui.checkAuthHTTP.setChecked(auth_settings.get("http_enabled", False))
+            self.ui.checkAuthManual.setChecked(auth_settings.get("manual_enabled", False))
+            
+            # Load authentication field values
+            self.ui.edtAuthUsername.setText(auth_settings.get("username", ""))
+            self.ui.edtAuthPassword.setText(auth_settings.get("password", ""))
+            
+            # Apply checkbox states (this will enable/disable fields appropriately)
+            self.on_auth_http_toggled()
+            self.on_auth_manual_toggled()
         
         # TODO: Add loading for other tab settings here as needed
         
