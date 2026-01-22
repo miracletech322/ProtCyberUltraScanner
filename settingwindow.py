@@ -12,6 +12,7 @@ class SettingWindow(QWidget):
         self.setup_toggle_buttons()
         self.setup_back_button()
         self.setup_advanced_settings()
+        self.setup_proxy_radio_buttons()
         self.load_stylesheet()
     
     def setup_toggle_buttons(self):
@@ -112,6 +113,32 @@ class SettingWindow(QWidget):
         self.ui.btnFormInputs.setVisible(checked)
         self.ui.btnTestVectors.setVisible(checked)
         self.ui.btnTechnologies.setVisible(checked)
+    
+    def setup_proxy_radio_buttons(self):
+        """Setup proxy radio buttons to enable/disable proxy fields"""
+        # Connect all proxy radio buttons to the handler
+        self.ui.radProSystemProxy.toggled.connect(self.on_proxy_radio_toggled)
+        self.ui.radProNoProxy.toggled.connect(self.on_proxy_radio_toggled)
+        self.ui.radProHTTP.toggled.connect(self.on_proxy_radio_toggled)
+        self.ui.radProSOCKS.toggled.connect(self.on_proxy_radio_toggled)
+        
+        # Set initial state (radProSystemProxy is checked by default, so fields should be disabled)
+        self.on_proxy_radio_toggled()
+    
+    def on_proxy_radio_toggled(self):
+        """Handle proxy radio button toggle - enable/disable proxy fields"""
+        # If System Proxy or No Proxy is selected, disable the fields
+        # Otherwise (HTTP or SOCKS), enable them
+        if self.ui.radProSystemProxy.isChecked() or self.ui.radProNoProxy.isChecked():
+            self.ui.edtProIP.setEnabled(False)
+            self.ui.spnProPort.setEnabled(False)
+            self.ui.edtProUsername.setEnabled(False)
+            self.ui.edtProPassword.setEnabled(False)
+        else:
+            self.ui.edtProIP.setEnabled(True)
+            self.ui.spnProPort.setEnabled(True)
+            self.ui.edtProUsername.setEnabled(True)
+            self.ui.edtProPassword.setEnabled(True)
     
     def on_back_clicked(self):
         """Handle back button click - close settingwindow and show frontwindow"""
