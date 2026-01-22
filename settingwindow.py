@@ -33,6 +33,9 @@ class SettingWindow(QWidget):
         self.setup_test_vectors_settings_save()
         self.setup_technologies_table()
         self.setup_test_profiles()
+        # Create default settings.json if it doesn't exist
+        if not os.path.exists(self.settings_file):
+            self.create_default_settings()
         self.load_settings()
         self.load_stylesheet()
     
@@ -1082,15 +1085,102 @@ class SettingWindow(QWidget):
         
         self._loading_settings = False
     
+    def create_default_settings(self):
+        """Create default settings.json file with all default values"""
+        default_settings = {
+            "proxy": {
+                "type": "system",
+                "ip": "",
+                "port": 0,
+                "username": "",
+                "password": ""
+            },
+            "authentication": {
+                "http_enabled": False,
+                "manual_enabled": False,
+                "username": "",
+                "password": ""
+            },
+            "http": {
+                "timeout": 60,
+                "parallel": 4,
+                "max_request": 5,
+                "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.3",
+                "additional_cookies": "",
+                "additional_http": "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\nAccept-Language: en-US,en;q=0.5"
+            },
+            "crawler": {
+                "max_depth_enabled": True,
+                "max_depth": 5,
+                "max_count_enabled": True,
+                "max_count": 70000,
+                "file_exclusion_enabled": True,
+                "file_exclusion": "*.7z,*.a3c,*.a52,*.aac,*.ac3,*.ace,*.acsm,*.am,*.apk,*.asf,*.asx,*.avi,*.azw3,*.azw4,*.bin,*.bmp,*.bz2,*.cab,*.cmd,*.conf,*.css,*.csv,*.divx,*.djvu,*.doc,*.docx,*.dts,*.dv,*.engine,*.eot,*.eps,*.epub,*.exe,*.fla,*.flac,*.flv,*.fvi,*.gif,*.gxf,*.gz,*.ice,*.ico,*.inc,*.info,*.install,*.iso,*.jar,*.jpe,*.jpeg,*.jpg,*.lang,*.m1v,*.m2ts,*.m2v,*.m4a,*.m4p,*.m4v,*.mdb,*.mid,*.midi,*.mka,*.mkv,*.mod,*.mov,*.movie,*.mp,*.mp1,*.mp2,*.mp3,*.mp4,*.mpeg,*.mpeg1,*.mpeg2,*.mpeg4,*.mpg,*.mpga,*.mpp,*.mpt,*.msi,*.mts,*.mtv,*.mxf,*.oga,*.ogg,*.ogm,*.ogv,*.ogx,*.oma,*.opus,*.pac,*.pcx,*.pdf,*.pgm,*.png,*.ppsx,*.ppt,*.pptx,*.profile,*.ps,*.psd,*.ram,*.rar,*.rb,*.res,*.rmf,*.rpm,*.save,*.scss,*.sh,*.spx,*.sql,*.svg,*.svn-base,*.svn-work,*.swf,*.tar,*.tbz2,*.tgz,*.tif,*.tiff,*.ts,*.tta,*.ttf,*.uff,*.vob,*.vox,*.vro,*.wav,*.wbmp,*.webm,*.wma,*.wmv,*.woff,*.xls,*.xlsx,*.xm,*.zip,*.abw,*.arc,*.azw,*.bz,*.csh,*.ics,*.mpkg,*.odp,*.ods,*.odt,*.otf,*.rtf,*.txt,*.vsd,*.weba,*.webp,*.woff2,*.xul,*.3gp,*.3g2,*.xcf,*.map",
+                "evaluate_enabled": True,
+                "url_exclusion": "*sign?out*\n*log?out*\n*exit*\n*kill*\n*delete*\n*remove*\n*/.svn/+\n*/.git/+\n*/phpMyAdmin/+\n*/pgadmin/+\n*/roundcube/+\n*/%/%/%/%/%/%/%/%/%/%/%/%",
+                "scan_subdomain": False,
+                "scan_target_url": False,
+                "scope": "Smart",
+                "scope_regex": ""
+            },
+            "form_inputs": {
+                "username": "",
+                "password": "",
+                "email": "",
+                "first_name": "",
+                "last_name": "",
+                "address": "",
+                "city": "",
+                "state": "",
+                "zip": "",
+                "country": "",
+                "company": "",
+                "phone": "",
+                "day": "",
+                "month": "",
+                "year": "",
+                "age": "",
+                "prefix": "",
+                "language": ""
+            },
+            "test_vectors": {
+                "get_enabled": False,
+                "post_enabled": False,
+                "cookie_enabled": False,
+                "header_enabled": False,
+                "url_path_enabled": True,
+                "parameter": "*;;PHPSESSID;;Any;;*\n*;;__VIEWSTATE;;Any;;*\n*;;__EVENTTARGET;;POST;;*\n*;;__EVENTARGUMENT;;POST;;*\n*;;__VIEWSTATEGENERATOR;;POST;;*\n*;;__EVENTVALIDATION;;POST;;*\n*;;__VIEWSTATEENCRYPTED;;POST;;*\n*;;__VSTATE;;Any;;*\n*;;__VIEWSTATEFIELDCOUNT;;Any;;*\n*;;__COMPRESSEDVIEWSTATE;;Any;;*\n*;;__ASYNCPOST;;POST;;*\n*;;SCROLLPOSITION?;;QUERY;;*\n*;;LASTFOCUS?;;QUERY;;*\n*;;utm*;;Any;;*\n*;;_ga;;Any;;*\n*;;_gat;;Any;;*\n*;;__utm*;;Any;;*\n*;;submit*;;POST;;*\n*;;submit*;;QUERY;;*\n*;;_javax.faces.ViewState;;POST;;*\n*;;_javax.faces.ViewState;;POST;;*\n*;;org.apache.struts.taglib.html.TOKEN;;POST;;*\n*;;jsessionid;;Any;;*\n*;;cfid;;COOKIE;;*\n*;;cftoken;;COOKIE;;*\n*;;ASP.NET_SessionId;;Any;;*\n*;;ASPSESSIONID*;;Any;;*\n*;;SITESERVER;;Any;;*\n*;;*csrf*;;Any;;*\n*;;*token*;;Any;;*\n*;;*nonce*;;Any;;*\n*;;*;;*;;COOKIE;;[md5]\n*;;*;;*;;COOKIE;;[guid]\n*;;*;;*;;PATH;;[year]\n*;;*;;*;;Any;;[base64]\n*[seo]*;;*;;*;;QUERY;;*\n*[non-english]*;;*;;*;;QUERY;;*\n*/;;*;;path;;*"
+            },
+            "technologies": [],
+            "test_profiles": {
+                "Default": getattr(self, 'profile_mappings', {}).get("Default", {}),
+                "No Test": getattr(self, 'profile_mappings', {}).get("No Test", {}),
+                "OWASP Top 10": getattr(self, 'profile_mappings', {}).get("OWASP Top 10", {}),
+                "Passive": getattr(self, 'profile_mappings', {}).get("Passive", {}),
+                "Headers Security": getattr(self, 'profile_mappings', {}).get("Headers Security", {}),
+                "Web Server Security": getattr(self, 'profile_mappings', {}).get("Web Server Security", {}),
+                "High Impact": getattr(self, 'profile_mappings', {}).get("High Impact", {}),
+                "Custom": getattr(self, 'profile_mappings', {}).get("Default", {}).copy() if hasattr(self, 'profile_mappings') and "Default" in getattr(self, 'profile_mappings', {}) else {},
+                "_current_profile": "Default"
+            }
+        }
+        
+        # Save default settings to file
+        self.save_all_settings(default_settings)
+        return default_settings
+    
     def load_all_settings(self):
-        """Load all settings from JSON file, return default dict if file doesn't exist"""
+        """Load all settings from JSON file, create default if file doesn't exist"""
         if os.path.exists(self.settings_file):
             try:
                 with open(self.settings_file, 'r', encoding='utf-8') as f:
                     return json.load(f)
             except (json.JSONDecodeError, IOError):
-                return {}
-        return {}
+                # If file is corrupted, create default settings
+                return self.create_default_settings()
+        else:
+            # If file doesn't exist, create default settings
+            return self.create_default_settings()
     
     def save_all_settings(self, settings):
         """Save all settings to JSON file"""
