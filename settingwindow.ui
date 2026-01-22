@@ -1383,12 +1383,18 @@
                  <property name="text">
                   <string>GET</string>
                  </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
                 </widget>
                </item>
                <item>
                 <widget class="QCheckBox" name="checkTPOST">
                  <property name="text">
                   <string>POST</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -1397,6 +1403,9 @@
                  <property name="text">
                   <string>Cookie</string>
                  </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
                 </widget>
                </item>
                <item>
@@ -1404,12 +1413,18 @@
                  <property name="text">
                   <string>Header</string>
                  </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
                 </widget>
                </item>
                <item>
                 <widget class="QCheckBox" name="checkTURLPath">
                  <property name="text">
                   <string>URL Path</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>

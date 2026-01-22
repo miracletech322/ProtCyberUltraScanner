@@ -26,6 +26,8 @@ class SettingWindow(QWidget):
         self.setup_crawler_checkboxes()
         self.setup_crawler_settings_save()
         self.setup_form_inputs_settings_save()
+        self.setup_test_vectors_defaults()
+        self.setup_test_vectors_settings_save()
         self.load_settings()
         self.load_stylesheet()
     
@@ -413,6 +415,41 @@ class SettingWindow(QWidget):
         
         self.save_all_settings(settings)
     
+    def setup_test_vectors_defaults(self):
+        """Set default value for Test Vectors tab edtTParameter field"""
+        # Set default value (will be overridden by load_settings if saved value exists)
+        default_parameter = "*;;PHPSESSID;;Any;;*\n*;;__VIEWSTATE;;Any;;*\n*;;__EVENTTARGET;;POST;;*\n*;;__EVENTARGUMENT;;POST;;*\n*;;__VIEWSTATEGENERATOR;;POST;;*\n*;;__EVENTVALIDATION;;POST;;*\n*;;__VIEWSTATEENCRYPTED;;POST;;*\n*;;__VSTATE;;Any;;*\n*;;__VIEWSTATEFIELDCOUNT;;Any;;*\n*;;__COMPRESSEDVIEWSTATE;;Any;;*\n*;;__ASYNCPOST;;POST;;*\n*;;SCROLLPOSITION?;;QUERY;;*\n*;;LASTFOCUS?;;QUERY;;*\n*;;utm*;;Any;;*\n*;;_ga;;Any;;*\n*;;_gat;;Any;;*\n*;;__utm*;;Any;;*\n*;;submit*;;POST;;*\n*;;submit*;;QUERY;;*\n*;;_javax.faces.ViewState;;POST;;*\n*;;_javax.faces.ViewState;;POST;;*\n*;;org.apache.struts.taglib.html.TOKEN;;POST;;*\n*;;jsessionid;;Any;;*\n*;;cfid;;COOKIE;;*\n*;;cftoken;;COOKIE;;*\n*;;ASP.NET_SessionId;;Any;;*\n*;;ASPSESSIONID*;;Any;;*\n*;;SITESERVER;;Any;;*\n*;;*csrf*;;Any;;*\n*;;*token*;;Any;;*\n*;;*nonce*;;Any;;*\n*;;*;;*;;COOKIE;;[md5]\n*;;*;;*;;COOKIE;;[guid]\n*;;*;;*;;PATH;;[year]\n*;;*;;*;;Any;;[base64]\n*[seo]*;;*;;*;;QUERY;;*\n*[non-english]*;;*;;*;;QUERY;;*\n*/;;*;;path;;*"
+        self.ui.edtTParameter.setPlainText(default_parameter)
+    
+    def setup_test_vectors_settings_save(self):
+        """Connect test vectors checkbox and field changes to save settings automatically"""
+        self.ui.checkTGET.toggled.connect(self.save_test_vectors_settings)
+        self.ui.checkTPOST.toggled.connect(self.save_test_vectors_settings)
+        self.ui.checkTCookie.toggled.connect(self.save_test_vectors_settings)
+        self.ui.checkTHeader.toggled.connect(self.save_test_vectors_settings)
+        self.ui.checkTURLPath.toggled.connect(self.save_test_vectors_settings)
+        self.ui.edtTParameter.textChanged.connect(self.save_test_vectors_settings)
+    
+    def save_test_vectors_settings(self):
+        """Save test vectors settings to JSON file"""
+        # Don't save during loading
+        if self._loading_settings:
+            return
+        
+        settings = self.load_all_settings()
+        
+        # Update test vectors settings
+        settings["test_vectors"] = {
+            "get_enabled": self.ui.checkTGET.isChecked(),
+            "post_enabled": self.ui.checkTPOST.isChecked(),
+            "cookie_enabled": self.ui.checkTCookie.isChecked(),
+            "header_enabled": self.ui.checkTHeader.isChecked(),
+            "url_path_enabled": self.ui.checkTURLPath.isChecked(),
+            "parameter": self.ui.edtTParameter.toPlainText()
+        }
+        
+        self.save_all_settings(settings)
+    
     def save_proxy_settings(self):
         """Save proxy settings to JSON file"""
         # Don't save during loading
@@ -562,6 +599,23 @@ class SettingWindow(QWidget):
             self.ui.edtFAge.setText(form_settings.get("age", ""))
             self.ui.edtFPrefix.setText(form_settings.get("prefix", ""))
             self.ui.edtFLanguage.setText(form_settings.get("language", ""))
+        
+        # Load test vectors settings
+        if "test_vectors" in settings:
+            test_vectors_settings = settings["test_vectors"]
+            
+            # Load checkbox states
+            self.ui.checkTGET.setChecked(test_vectors_settings.get("get_enabled", False))
+            self.ui.checkTPOST.setChecked(test_vectors_settings.get("post_enabled", False))
+            self.ui.checkTCookie.setChecked(test_vectors_settings.get("cookie_enabled", False))
+            self.ui.checkTHeader.setChecked(test_vectors_settings.get("header_enabled", False))
+            self.ui.checkTURLPath.setChecked(test_vectors_settings.get("url_path_enabled", False))
+            
+            # Load parameter field value
+            self.ui.edtTParameter.setPlainText(test_vectors_settings.get("parameter", "*;;PHPSESSID;;Any;;*\n*;;__VIEWSTATE;;Any;;*\n*;;__EVENTTARGET;;POST;;*\n*;;__EVENTARGUMENT;;POST;;*\n*;;__VIEWSTATEGENERATOR;;POST;;*\n*;;__EVENTVALIDATION;;POST;;*\n*;;__VIEWSTATEENCRYPTED;;POST;;*\n*;;__VSTATE;;Any;;*\n*;;__VIEWSTATEFIELDCOUNT;;Any;;*\n*;;__COMPRESSEDVIEWSTATE;;Any;;*\n*;;__ASYNCPOST;;POST;;*\n*;;SCROLLPOSITION?;;QUERY;;*\n*;;LASTFOCUS?;;QUERY;;*\n*;;utm*;;Any;;*\n*;;_ga;;Any;;*\n*;;_gat;;Any;;*\n*;;__utm*;;Any;;*\n*;;submit*;;POST;;*\n*;;submit*;;QUERY;;*\n*;;_javax.faces.ViewState;;POST;;*\n*;;_javax.faces.ViewState;;POST;;*\n*;;org.apache.struts.taglib.html.TOKEN;;POST;;*\n*;;jsessionid;;Any;;*\n*;;cfid;;COOKIE;;*\n*;;cftoken;;COOKIE;;*\n*;;ASP.NET_SessionId;;Any;;*\n*;;ASPSESSIONID*;;Any;;*\n*;;SITESERVER;;Any;;*\n*;;*csrf*;;Any;;*\n*;;*token*;;Any;;*\n*;;*nonce*;;Any;;*\n*;;*;;*;;COOKIE;;[md5]\n*;;*;;*;;COOKIE;;[guid]\n*;;*;;*;;PATH;;[year]\n*;;*;;*;;Any;;[base64]\n*[seo]*;;*;;*;;QUERY;;*\n*[non-english]*;;*;;*;;QUERY;;*\n*/;;*;;path;;*"))
+        else:
+            # If no saved settings, apply defaults
+            self.setup_test_vectors_defaults()
         
         # TODO: Add loading for other tab settings here as needed
         
