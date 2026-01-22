@@ -1,0 +1,55 @@
+/* Sidebar widget */
+#widgetSidebar {
+	background-color: #f3f4f6;
+}
+
+/* Sidebar label */
+#labelBack {
+	color: #2C3E50;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+/* Toggle buttons - default state (inactive) */
+#btnTests, #btnProxy, #btnAuthentication, #btnHTTP, #btnCrawler, 
+#btnFormInputs, #btnTestVectors, #btnTechnologies {
+	background-color: transparent;
+	border: none;
+	color: black;
+	font-size: 14px;
+	padding: 12px 16px;
+	text-align: left;
+	border-radius: 0;
+}
+
+/* Toggle buttons - active/checked state (dark green background, white text) */
+#btnTests:checked, #btnProxy:checked, #btnAuthentication:checked, 
+#btnHTTP:checked, #btnCrawler:checked, #btnFormInputs:checked, 
+#btnTestVectors:checked, #btnTechnologies:checked {
+	background-color: #1B5E20;
+	color: white;
+}
+
+/* Toggle buttons - hover state */
+#btnTests:hover, #btnProxy:hover, #btnAuthentication:hover, 
+#btnHTTP:hover, #btnCrawler:hover, #btnFormInputs:hover, 
+#btnTestVectors:hover, #btnTechnologies:hover {
+	background-color: rgba(101, 101, 104, 0.5);
+    color: black;
+}
+
+/* Back button */
+#btnBack {
+	background-color: transparent;
+	border: none;
+	color: #2C3E50;
+	font-size: 18px;
+	font-weight: bold;
+	padding: 4px 8px;
+}
+
+#btnBack:hover {
+	background-color: rgba(0, 0, 0, 0.05);
+	border-radius: 4px;
+}
+

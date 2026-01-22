@@ -7,5 +7,6 @@
     <file>settings.png</file>
     <file>frontwindow.qss</file>
     <file>mainwindow.qss</file>
+    <file>settingwindow.qss</file>
   </qresource>
 </RCC>
