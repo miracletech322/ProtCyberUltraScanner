@@ -11,6 +11,7 @@ class SettingWindow(QWidget):
         self.setup_tab_widget()
         self.setup_toggle_buttons()
         self.setup_back_button()
+        self.setup_advanced_settings()
         self.load_stylesheet()
     
     def setup_toggle_buttons(self):
@@ -33,6 +34,17 @@ class SettingWindow(QWidget):
         
         # Set btnTests as checked by default
         self.ui.btnTests.setChecked(True)
+        
+        # Set initial visibility: show basic buttons, hide advanced buttons
+        self.ui.btnTests.setVisible(True)
+        self.ui.btnProxy.setVisible(True)
+        self.ui.btnAuthentication.setVisible(True)
+        
+        self.ui.btnHTTP.setVisible(False)
+        self.ui.btnCrawler.setVisible(False)
+        self.ui.btnFormInputs.setVisible(False)
+        self.ui.btnTestVectors.setVisible(False)
+        self.ui.btnTechnologies.setVisible(False)
     
     def on_button_toggled(self, button, checked):
         """Handle button toggle - ensure only one is checked at a time"""
@@ -87,6 +99,19 @@ class SettingWindow(QWidget):
     def setup_back_button(self):
         """Setup back button to close settingwindow and show frontwindow"""
         self.ui.btnBack.clicked.connect(self.on_back_clicked)
+    
+    def setup_advanced_settings(self):
+        """Setup advanced settings checkbox to show/hide advanced buttons"""
+        self.ui.checkAdvancedSettings.toggled.connect(self.on_advanced_settings_toggled)
+    
+    def on_advanced_settings_toggled(self, checked):
+        """Handle advanced settings checkbox toggle"""
+        # Show/hide advanced buttons based on checkbox state
+        self.ui.btnHTTP.setVisible(checked)
+        self.ui.btnCrawler.setVisible(checked)
+        self.ui.btnFormInputs.setVisible(checked)
+        self.ui.btnTestVectors.setVisible(checked)
+        self.ui.btnTechnologies.setVisible(checked)
     
     def on_back_clicked(self):
         """Handle back button click - close settingwindow and show frontwindow"""

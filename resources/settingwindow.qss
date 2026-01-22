@@ -53,3 +53,9 @@
 	border-radius: 4px;
 }
 
+#labelProxy, #labelAuthentication, #labelHTTP, #labelCrawler,
+#labelFormInputs, #labelTestVectors, #labelTechnologies, #labelTests {
+	color: #2C3E50;
+	font-size: 16px;
+	font-weight: bold;
+}
