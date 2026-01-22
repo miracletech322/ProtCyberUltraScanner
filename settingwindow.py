@@ -1,3 +1,5 @@
+import json
+import os
 from PySide6.QtCore import QFile, QTextStream
 from PySide6.QtWidgets import QWidget
 from ui_settingwindow import Ui_SettingWindow
@@ -8,11 +10,15 @@ class SettingWindow(QWidget):
         self.ui = Ui_SettingWindow()
         self.ui.setupUi(self)
         self.main_window = None  # Will be set by MainWindow
+        self.settings_file = os.path.join(os.path.dirname(__file__), "settings.json")
+        self._loading_settings = False  # Flag to prevent saving during load
         self.setup_tab_widget()
         self.setup_toggle_buttons()
         self.setup_back_button()
         self.setup_advanced_settings()
         self.setup_proxy_radio_buttons()
+        self.setup_proxy_settings_save()
+        self.load_settings()
         self.load_stylesheet()
     
     def setup_toggle_buttons(self):
@@ -139,6 +145,97 @@ class SettingWindow(QWidget):
             self.ui.spnProPort.setEnabled(True)
             self.ui.edtProUsername.setEnabled(True)
             self.ui.edtProPassword.setEnabled(True)
+    
+    def setup_proxy_settings_save(self):
+        """Connect proxy field changes to save settings automatically"""
+        self.ui.edtProIP.textChanged.connect(self.save_proxy_settings)
+        self.ui.spnProPort.valueChanged.connect(self.save_proxy_settings)
+        self.ui.edtProUsername.textChanged.connect(self.save_proxy_settings)
+        self.ui.edtProPassword.textChanged.connect(self.save_proxy_settings)
+        # Also save when radio buttons change
+        self.ui.radProSystemProxy.toggled.connect(self.save_proxy_settings)
+        self.ui.radProNoProxy.toggled.connect(self.save_proxy_settings)
+        self.ui.radProHTTP.toggled.connect(self.save_proxy_settings)
+        self.ui.radProSOCKS.toggled.connect(self.save_proxy_settings)
+    
+    def save_proxy_settings(self):
+        """Save proxy settings to JSON file"""
+        # Don't save during loading
+        if self._loading_settings:
+            return
+        
+        settings = self.load_all_settings()
+        
+        # Determine which proxy type is selected
+        proxy_type = "system"
+        if self.ui.radProNoProxy.isChecked():
+            proxy_type = "none"
+        elif self.ui.radProHTTP.isChecked():
+            proxy_type = "http"
+        elif self.ui.radProSOCKS.isChecked():
+            proxy_type = "socks"
+        
+        # Update proxy settings
+        settings["proxy"] = {
+            "type": proxy_type,
+            "ip": self.ui.edtProIP.text(),
+            "port": self.ui.spnProPort.value(),
+            "username": self.ui.edtProUsername.text(),
+            "password": self.ui.edtProPassword.text()
+        }
+        
+        self.save_all_settings(settings)
+    
+    def load_settings(self):
+        """Load all settings from JSON file"""
+        self._loading_settings = True
+        settings = self.load_all_settings()
+        
+        # Load proxy settings
+        if "proxy" in settings:
+            proxy_settings = settings["proxy"]
+            
+            # Set proxy type
+            proxy_type = proxy_settings.get("type", "system")
+            if proxy_type == "none":
+                self.ui.radProNoProxy.setChecked(True)
+            elif proxy_type == "http":
+                self.ui.radProHTTP.setChecked(True)
+            elif proxy_type == "socks":
+                self.ui.radProSOCKS.setChecked(True)
+            else:
+                self.ui.radProSystemProxy.setChecked(True)
+            
+            # Load proxy field values
+            self.ui.edtProIP.setText(proxy_settings.get("ip", ""))
+            self.ui.spnProPort.setValue(proxy_settings.get("port", 0))
+            self.ui.edtProUsername.setText(proxy_settings.get("username", ""))
+            self.ui.edtProPassword.setText(proxy_settings.get("password", ""))
+            
+            # Update enabled state based on proxy type
+            self.on_proxy_radio_toggled()
+        
+        # TODO: Add loading for other tab settings here as needed
+        
+        self._loading_settings = False
+    
+    def load_all_settings(self):
+        """Load all settings from JSON file, return default dict if file doesn't exist"""
+        if os.path.exists(self.settings_file):
+            try:
+                with open(self.settings_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except (json.JSONDecodeError, IOError):
+                return {}
+        return {}
+    
+    def save_all_settings(self, settings):
+        """Save all settings to JSON file"""
+        try:
+            with open(self.settings_file, 'w', encoding='utf-8') as f:
+                json.dump(settings, f, indent=4, ensure_ascii=False)
+        except IOError:
+            pass  # Silently fail if we can't write the file
     
     def on_back_clicked(self):
         """Handle back button click - close settingwindow and show frontwindow"""
