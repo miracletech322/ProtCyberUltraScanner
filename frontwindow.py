@@ -1,7 +1,6 @@
 import os
-from pathlib import Path
-from PySide6.QtCore import Qt, QFile, QTextStream
-from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtCore import QFile, QTextStream
+from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QIcon
 
 from ui_frontwindow import Ui_FrontWindow
@@ -16,6 +15,7 @@ class FrontWindow(QWidget):
         self.setup_button_icons()
         self.setup_input_focus()
         self.setup_setting_button()
+        self.setup_scan_button()
         self.load_stylesheet()
     
     def setup_toggle_buttons(self):
@@ -77,6 +77,15 @@ class FrontWindow(QWidget):
         """Handle setting button click - show SettingWindow in MDI area"""
         if self.main_window:
             self.main_window.show_settingwindow()
+    
+    def setup_scan_button(self):
+        """Setup scan button to show ScanWindow"""
+        self.ui.btnScan.clicked.connect(self.on_scan_clicked)
+    
+    def on_scan_clicked(self):
+        """Handle scan button click - show ScanWindow in MDI area"""
+        if self.main_window:
+            self.main_window.show_scanwindow()
     
     def setup_input_focus(self):
         """Setup focus handling for input field to update widgetInput border"""

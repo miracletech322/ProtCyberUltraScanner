@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QMdiSubWindow
 from ui_mainwindow import Ui_MainWindow
 from frontwindow import FrontWindow
 from settingwindow import SettingWindow
+from scanwindow import ScanWindow
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -13,6 +14,7 @@ class MainWindow(QMainWindow):
         # Store references to subwindows
         self.frontwindow_subwindow = None
         self.settingwindow_subwindow = None
+        self.scanwindow_subwindow = None
         
         # Show frontwindow in mdiArea by default
         self.show_frontwindow()
@@ -59,6 +61,25 @@ class MainWindow(QMainWindow):
             # If it exists, just show it
             self.settingwindow_subwindow.showMaximized()
             self.ui.mdiArea.setActiveSubWindow(self.settingwindow_subwindow)
+    
+    def show_scanwindow(self):
+        """Create and show ScanWindow in the MDI area"""
+        # Only create if it doesn't exist
+        if self.scanwindow_subwindow is None:
+            scan_window = ScanWindow()
+            sub_window = QMdiSubWindow()
+            sub_window.setWidget(scan_window)
+            sub_window.setWindowFlags(Qt.FramelessWindowHint)
+            self.ui.mdiArea.addSubWindow(sub_window)
+            self.scanwindow_subwindow = sub_window
+            # Connect close event to clear reference
+            sub_window.destroyed.connect(lambda: setattr(self, 'scanwindow_subwindow', None))
+            sub_window.showMaximized()
+            self.ui.mdiArea.setActiveSubWindow(sub_window)
+        else:
+            # If it exists, just show it
+            self.scanwindow_subwindow.showMaximized()
+            self.ui.mdiArea.setActiveSubWindow(self.scanwindow_subwindow)
     
     def close_settingwindow_and_show_frontwindow(self):
         """Close settingwindow and show frontwindow"""
