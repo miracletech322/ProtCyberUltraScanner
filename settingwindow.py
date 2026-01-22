@@ -25,6 +25,7 @@ class SettingWindow(QWidget):
         self.setup_crawler_defaults()
         self.setup_crawler_checkboxes()
         self.setup_crawler_settings_save()
+        self.setup_form_inputs_settings_save()
         self.load_settings()
         self.load_stylesheet()
     
@@ -359,6 +360,59 @@ class SettingWindow(QWidget):
         
         self.save_all_settings(settings)
     
+    def setup_form_inputs_settings_save(self):
+        """Connect form input field changes to save settings automatically"""
+        self.ui.edtFUsername.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFPassword.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFEmail.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFFirstName.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFLastName.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFAddress.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFCity.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFState.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFZip.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFCountry.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFCompany.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFPhone.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFDay.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFMonth.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFYear.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFAge.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFPrefix.textChanged.connect(self.save_form_inputs_settings)
+        self.ui.edtFLanguage.textChanged.connect(self.save_form_inputs_settings)
+    
+    def save_form_inputs_settings(self):
+        """Save form inputs settings to JSON file"""
+        # Don't save during loading
+        if self._loading_settings:
+            return
+        
+        settings = self.load_all_settings()
+        
+        # Update form inputs settings
+        settings["form_inputs"] = {
+            "username": self.ui.edtFUsername.text(),
+            "password": self.ui.edtFPassword.text(),
+            "email": self.ui.edtFEmail.text(),
+            "first_name": self.ui.edtFFirstName.text(),
+            "last_name": self.ui.edtFLastName.text(),
+            "address": self.ui.edtFAddress.text(),
+            "city": self.ui.edtFCity.text(),
+            "state": self.ui.edtFState.text(),
+            "zip": self.ui.edtFZip.text(),
+            "country": self.ui.edtFCountry.text(),
+            "company": self.ui.edtFCompany.text(),
+            "phone": self.ui.edtFPhone.text(),
+            "day": self.ui.edtFDay.text(),
+            "month": self.ui.edtFMonth.text(),
+            "year": self.ui.edtFYear.text(),
+            "age": self.ui.edtFAge.text(),
+            "prefix": self.ui.edtFPrefix.text(),
+            "language": self.ui.edtFLanguage.text()
+        }
+        
+        self.save_all_settings(settings)
+    
     def save_proxy_settings(self):
         """Save proxy settings to JSON file"""
         # Don't save during loading
@@ -484,6 +538,30 @@ class SettingWindow(QWidget):
             self.setup_crawler_defaults()
             # Apply scope visibility for defaults
             self.on_crawler_scope_changed()
+        
+        # Load form inputs settings
+        if "form_inputs" in settings:
+            form_settings = settings["form_inputs"]
+            
+            # Load form input field values
+            self.ui.edtFUsername.setText(form_settings.get("username", ""))
+            self.ui.edtFPassword.setText(form_settings.get("password", ""))
+            self.ui.edtFEmail.setText(form_settings.get("email", ""))
+            self.ui.edtFFirstName.setText(form_settings.get("first_name", ""))
+            self.ui.edtFLastName.setText(form_settings.get("last_name", ""))
+            self.ui.edtFAddress.setText(form_settings.get("address", ""))
+            self.ui.edtFCity.setText(form_settings.get("city", ""))
+            self.ui.edtFState.setText(form_settings.get("state", ""))
+            self.ui.edtFZip.setText(form_settings.get("zip", ""))
+            self.ui.edtFCountry.setText(form_settings.get("country", ""))
+            self.ui.edtFCompany.setText(form_settings.get("company", ""))
+            self.ui.edtFPhone.setText(form_settings.get("phone", ""))
+            self.ui.edtFDay.setText(form_settings.get("day", ""))
+            self.ui.edtFMonth.setText(form_settings.get("month", ""))
+            self.ui.edtFYear.setText(form_settings.get("year", ""))
+            self.ui.edtFAge.setText(form_settings.get("age", ""))
+            self.ui.edtFPrefix.setText(form_settings.get("prefix", ""))
+            self.ui.edtFLanguage.setText(form_settings.get("language", ""))
         
         # TODO: Add loading for other tab settings here as needed
         
