@@ -24,9 +24,10 @@ class FrontWindow(QWidget):
         self.ui.btnURL.setCheckable(True)
         self.ui.btnHTTP.setCheckable(True)
         
-        # Set default visibility: cmbRequest hidden, btnTool visible (URL mode by default)
+        # Set default visibility: cmbRequest hidden, btnTool visible, widgetContent hidden (URL mode by default)
         self.ui.cmbRequest.setVisible(False)
         self.ui.btnTool.setVisible(True)
+        self.ui.widgetContent.setVisible(False)
         
         # Set btnURL as checked by default
         self.ui.btnURL.setChecked(True)
@@ -39,9 +40,10 @@ class FrontWindow(QWidget):
         """Handle URL button toggle"""
         if checked:
             self.ui.btnHTTP.setChecked(False)
-            # URL active: cmbRequest hidden, btnTool visible
+            # URL active: cmbRequest hidden, btnTool visible, widgetContent hidden
             self.ui.cmbRequest.setVisible(False)
             self.ui.btnTool.setVisible(True)
+            self.ui.widgetContent.setVisible(False)
         elif not self.ui.btnHTTP.isChecked():
             # If URL is unchecked and HTTP is also unchecked, keep URL checked
             self.ui.btnURL.setChecked(True)
@@ -50,9 +52,10 @@ class FrontWindow(QWidget):
         """Handle HTTP button toggle"""
         if checked:
             self.ui.btnURL.setChecked(False)
-            # HTTP active: cmbRequest visible, btnTool hidden
+            # HTTP active: cmbRequest visible, btnTool hidden, widgetContent visible
             self.ui.cmbRequest.setVisible(True)
             self.ui.btnTool.setVisible(False)
+            self.ui.widgetContent.setVisible(True)
         elif not self.ui.btnURL.isChecked():
             # If HTTP is unchecked and URL is also unchecked, keep HTTP checked
             self.ui.btnHTTP.setChecked(True)
