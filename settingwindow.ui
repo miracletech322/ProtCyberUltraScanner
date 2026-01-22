@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>691</width>
-    <height>367</height>
+    <width>910</width>
+    <height>544</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -158,41 +158,1433 @@
         <attribute name="title">
          <string>Tests</string>
         </attribute>
+        <layout class="QGridLayout" name="gridLayout_10">
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout_30">
+           <item>
+            <widget class="QLabel" name="labelTests">
+             <property name="text">
+              <string>Tests</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_21">
+             <item>
+              <widget class="QLabel" name="labelTestProfile">
+               <property name="text">
+                <string>Test Profile:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="cmbTestProfile">
+               <item>
+                <property name="text">
+                 <string>Default</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>No Test</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>OWASP Top 10</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Passive</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Headers Security</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Web Server Security</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>High Impact</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Custom</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_9">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_20">
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_27">
+               <item>
+                <widget class="QCheckBox" name="checkTestSQLInjection">
+                 <property name="text">
+                  <string>SQL Injection</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestBlindSQLInjection">
+                 <property name="text">
+                  <string>Blind SQL Injection</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestTimeBasedSQLInjection">
+                 <property name="text">
+                  <string>Time Based SQL Injection</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestExpressionLanguageInjection">
+                 <property name="text">
+                  <string>Expression Language Injection</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestInsecureDirectObjectReference">
+                 <property name="text">
+                  <string>Insecure Direct Object Reference (IDOR)</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestOSCommandExecution">
+                 <property name="text">
+                  <string>OS Command Execution</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestUnvalidatedRedirections">
+                 <property name="text">
+                  <string>Unvalidated Redirections</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestOld">
+                 <property name="text">
+                  <string>Old/Backup Resource</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestHiddenResource">
+                 <property name="text">
+                  <string>Hidden Resource</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestSensitiveDataDisclosure">
+                 <property name="text">
+                  <string>Sensitive Data Disclosure</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestVulnerableJavaScriptLibraryUsage">
+                 <property name="text">
+                  <string>Vulnerable JavaScript Library Usage</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestDirectoryListing">
+                 <property name="text">
+                  <string>Directory Listing</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestRemoteFileInclusion">
+                 <property name="text">
+                  <string>Remote File Inclusion</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestLocalFileInclusion">
+                 <property name="text">
+                  <string>Local File Inclusion</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestServerSideRequestForgery">
+                 <property name="text">
+                  <string>Server-Side Request Forgery</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestPathTraversal">
+                 <property name="text">
+                  <string>Path Traversal</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestCrossSiteScripting">
+                 <property name="text">
+                  <string>Cross Site Scripting</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_28">
+               <item>
+                <widget class="QCheckBox" name="checkTestInsecureDeserialization">
+                 <property name="text">
+                  <string>Insecure Deserialization</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestBufferOverflow">
+                 <property name="text">
+                  <string>Buffer Overflow</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestFuzzing">
+                 <property name="text">
+                  <string>Fuzzing</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestUnicodeTransformationIssue">
+                 <property name="text">
+                  <string>Unicode Transformation Issue</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestTestforRobots">
+                 <property name="text">
+                  <string>Test for Robots.txt</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestCheckSitemap">
+                 <property name="text">
+                  <string>Check Sitemap</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestPassive">
+                 <property name="text">
+                  <string>Passive Tests</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestWordPress">
+                 <property name="text">
+                  <string>WordPress Tests</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestDrupal">
+                 <property name="text">
+                  <string>Drupal Tests</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestJoomla">
+                 <property name="text">
+                  <string>Joomla Tests</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestApacheHTTPD">
+                 <property name="text">
+                  <string>Apache HTTPD Tests</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestApacheStruts">
+                 <property name="text">
+                  <string>Apache Struts Tests</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestApacheTomcat">
+                 <property name="text">
+                  <string>Apache Tomcat Tests</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestNginx">
+                 <property name="text">
+                  <string>Nginx Tests</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestMicrosoftIIS">
+                 <property name="text">
+                  <string>Microsoft IIS Tests</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestPHP">
+                 <property name="text">
+                  <string>PHP Tests</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestBruteForce">
+                 <property name="text">
+                  <string>Brute Force</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_29">
+               <item>
+                <widget class="QCheckBox" name="checkTestSSLTLS">
+                 <property name="text">
+                  <string>SSL/TLS Tests (Heartbleed, POODLE, CRIME, etc.)</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestTheShellShockBug">
+                 <property name="text">
+                  <string>The ShellShock Bug</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestHTTPHeaderSecurity">
+                 <property name="text">
+                  <string>HTTP Header Security Tests</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestTheHTTPHeadersAttacks">
+                 <property name="text">
+                  <string>The HTTP Headers Attacks</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTestDenialServiceAttacks">
+                 <property name="text">
+                  <string>Denial of Service Attacks</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_8">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tabProxy">
         <attribute name="title">
          <string>Proxy</string>
         </attribute>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QLabel" name="labelProxy">
+             <property name="text">
+              <string>Proxy</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <item>
+                <widget class="QRadioButton" name="radProSystemProxy">
+                 <property name="text">
+                  <string>System Proxy</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radProNoProxy">
+                 <property name="text">
+                  <string>No Proxy</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radProHTTP">
+                 <property name="text">
+                  <string>HTTP</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radProSOCKS">
+                 <property name="text">
+                  <string>SOCKS</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_3">
+                 <item>
+                  <widget class="QLabel" name="labelProIP">
+                   <property name="text">
+                    <string>IP:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelProPort">
+                   <property name="text">
+                    <string>Port:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelProUsername">
+                   <property name="text">
+                    <string>Username:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelProPassword">
+                   <property name="text">
+                    <string>Password:</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_4">
+                 <item>
+                  <widget class="QLineEdit" name="edtProIP"/>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="spnProPort">
+                   <property name="maximum">
+                    <number>999999999</number>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtProUsername"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtProPassword"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tabAuthentication">
         <attribute name="title">
          <string>Authentication</string>
         </attribute>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout_10">
+           <item>
+            <widget class="QLabel" name="labelAuthentication">
+             <property name="text">
+              <string>Authentication</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_9">
+               <item>
+                <widget class="QCheckBox" name="checkAuthHTTP">
+                 <property name="text">
+                  <string>HTTP</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_7">
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_6">
+                   <item>
+                    <widget class="QLabel" name="labelAuthUsername">
+                     <property name="text">
+                      <string>Username:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="labelAuthPassword">
+                     <property name="text">
+                      <string>Password:</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_7">
+                   <item>
+                    <widget class="QLineEdit" name="edtAuthUsername"/>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="edtAuthPassword"/>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_8">
+               <item>
+                <widget class="QCheckBox" name="checkAuthManual">
+                 <property name="text">
+                  <string>Manual Login</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnAuthLogin">
+                 <property name="text">
+                  <string>Login</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tabHTTP">
         <attribute name="title">
          <string>HTTP</string>
         </attribute>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout_13">
+           <item>
+            <widget class="QLabel" name="labelHTTP">
+             <property name="text">
+              <string>HTTP</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_11">
+                 <item>
+                  <widget class="QLabel" name="labelHHTTP">
+                   <property name="text">
+                    <string>HTTP:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelHParrallel">
+                   <property name="text">
+                    <string>Parallel Request:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkHMaxRequest">
+                   <property name="text">
+                    <string>Max requests/seconds:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelHUserAgent">
+                   <property name="text">
+                    <string>User agent:</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_12">
+                 <item>
+                  <widget class="QSpinBox" name="spnHHTTP"/>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="spnHParallel"/>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="spnHMaxRequest"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtHUserAgent"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="labelHAdditionalCookies">
+             <property name="text">
+              <string>Additional Cookies:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPlainTextEdit" name="edtAdditionalCookies"/>
+           </item>
+           <item>
+            <widget class="QLabel" name="labelHAdditionalHTTP">
+             <property name="text">
+              <string>Additional HTTP Headers:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPlainTextEdit" name="edtAdditionalHTTP"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tabCrawler">
         <attribute name="title">
          <string>Crawler</string>
         </attribute>
+        <layout class="QGridLayout" name="gridLayout_6">
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout_17">
+           <item>
+            <widget class="QLabel" name="labelCrawler">
+             <property name="text">
+              <string>Crawler</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_16">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_12">
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_14">
+                 <item>
+                  <widget class="QCheckBox" name="checkCMaxDepth">
+                   <property name="text">
+                    <string>Maximum Depth:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkCMaxCount">
+                   <property name="text">
+                    <string>Maximum Count:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkCFileExclution">
+                   <property name="text">
+                    <string>File Exclution:</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_15">
+                 <item>
+                  <widget class="QSpinBox" name="spnCMaxDepth"/>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="spnCMaxCount"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtCFileExclution"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkCEvaluate">
+               <property name="text">
+                <string>Evaluate JavaScripts Using Chromium</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_13">
+             <item>
+              <widget class="QLabel" name="labelCScope">
+               <property name="text">
+                <string>Scope:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="cmbCScope">
+               <item>
+                <property name="text">
+                 <string>Smart</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Manual</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkCScanSubDomain">
+             <property name="text">
+              <string>Scan Sub Domains</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkCScanTargetURL">
+             <property name="text">
+              <string>Scan above path of target URL</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_14">
+             <item>
+              <widget class="QLabel" name="labelCScopeRegex">
+               <property name="text">
+                <string>Scope Regex:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="edtCScopeRegex"/>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="labelCURLExclution">
+             <property name="text">
+              <string>URL Exclusion:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPlainTextEdit" name="edtCURLExclution"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tabFormInputs">
         <attribute name="title">
          <string>Form Inputs</string>
         </attribute>
+        <layout class="QGridLayout" name="gridLayout_7">
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout_23">
+           <item>
+            <widget class="QLabel" name="labelFormInputs">
+             <property name="text">
+              <string>Form Inputs</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_17">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_15">
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_18">
+                 <item>
+                  <widget class="QLabel" name="labelFUsername">
+                   <property name="text">
+                    <string>Username:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelFPassword">
+                   <property name="text">
+                    <string>Password:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelFEmail">
+                   <property name="text">
+                    <string>Email:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelFFirstName">
+                   <property name="text">
+                    <string>First Name:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelFLastName">
+                   <property name="text">
+                    <string>Last Name:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelFAddress">
+                   <property name="text">
+                    <string>Address:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelFCity">
+                   <property name="text">
+                    <string>City:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelFState">
+                   <property name="text">
+                    <string>State:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelFZip">
+                   <property name="text">
+                    <string>Zip:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelFCountry">
+                   <property name="text">
+                    <string>Country:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelFCompany">
+                   <property name="text">
+                    <string>Company:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelFPhone">
+                   <property name="text">
+                    <string>Phone:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="labelFDay">
+                   <property name="text">
+                    <string>Day:</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_19">
+                 <item>
+                  <widget class="QLineEdit" name="edtFUsername"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtFPassword"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtFEmail"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtFFirstName"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtFLastName"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtFAddress"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtFCity"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtFState"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtFZip"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtFCountry"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtFCompany"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtFPhone"/>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="edtFDay"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_22">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_16">
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_20">
+                   <item>
+                    <widget class="QLabel" name="labelFMonth">
+                     <property name="text">
+                      <string>Month:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="labelFYear">
+                     <property name="text">
+                      <string>Year:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="labelFAge">
+                     <property name="text">
+                      <string>Age:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="labelFPrefix">
+                     <property name="text">
+                      <string>Prefix:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="labelFLanguage">
+                     <property name="text">
+                      <string>Language:</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_21">
+                   <item>
+                    <widget class="QLineEdit" name="edtFMonth"/>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="edtFYear"/>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="edtFAge"/>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="edtFPrefix"/>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="edtFLanguage"/>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="verticalSpacer_5">
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Vertical</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tabTestVectors">
         <attribute name="title">
          <string>Test Vectors</string>
         </attribute>
+        <layout class="QGridLayout" name="gridLayout_8">
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout_25">
+           <item>
+            <widget class="QLabel" name="labelTestVectors">
+             <property name="text">
+              <string>Test Vectors</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_18">
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_24">
+               <item>
+                <widget class="QCheckBox" name="checkTGET">
+                 <property name="text">
+                  <string>GET</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTPOST">
+                 <property name="text">
+                  <string>POST</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTCookie">
+                 <property name="text">
+                  <string>Cookie</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTHeader">
+                 <property name="text">
+                  <string>Header</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="checkTURLPath">
+                 <property name="text">
+                  <string>URL Path</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_8">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="labelTParameter">
+             <property name="text">
+              <string>Parameter Exclusion (url;;name;;type;;value):</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPlainTextEdit" name="edtTParameter"/>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="tabTechnologies">
         <attribute name="title">
          <string>Technologies</string>
         </attribute>
+        <layout class="QGridLayout" name="gridLayout_9">
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout_26">
+           <item>
+            <widget class="QLabel" name="labelTechnologies">
+             <property name="text">
+              <string>Technologies</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="labelTechTitle">
+             <property name="text">
+              <string>Identify the target's utilized technologies to enhance the efficiency of the scan.</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_19">
+             <item>
+              <widget class="QComboBox" name="cmbTech">
+               <item>
+                <property name="text">
+                 <string>Windows Operating System</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Linux Operating System</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>PHP</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>ASP.NET</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>MySQL Database</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Mariadb Database</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Microsoft SQL Server Database</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>PostgreSQL Database</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Oracle Database</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>SQLite Database</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Sybase Database</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Microsoft Access Database</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Apatche Web Server</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Nginx Web Server</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Microsoft IIS Web Server</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Tomcat Web Server</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>WordPress</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Joomla!</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Durpal</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="labelTechURL">
+               <property name="text">
+                <string>at URL /</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="edtTechURL"/>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnTechDelete">
+               <property name="text">
+                <string>Delete</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
       </widget>
      </item>
