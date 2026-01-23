@@ -2,3 +2,6 @@ PySide6
 qasync
 pyinstaller
 requests
+beautifulsoup4
+lxml
+urllib3

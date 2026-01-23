@@ -62,24 +62,24 @@ class MainWindow(QMainWindow):
             self.settingwindow_subwindow.showMaximized()
             self.ui.mdiArea.setActiveSubWindow(self.settingwindow_subwindow)
     
-    def show_scanwindow(self):
+    def show_scanwindow(self, url=None, method=None, header_name=None, header_value=None, body=None):
         """Create and show ScanWindow in the MDI area"""
-        # Only create if it doesn't exist
-        if self.scanwindow_subwindow is None:
-            scan_window = ScanWindow()
-            sub_window = QMdiSubWindow()
-            sub_window.setWidget(scan_window)
-            sub_window.setWindowFlags(Qt.FramelessWindowHint)
-            self.ui.mdiArea.addSubWindow(sub_window)
-            self.scanwindow_subwindow = sub_window
-            # Connect close event to clear reference
-            sub_window.destroyed.connect(lambda: setattr(self, 'scanwindow_subwindow', None))
-            sub_window.showMaximized()
-            self.ui.mdiArea.setActiveSubWindow(sub_window)
-        else:
-            # If it exists, just show it
-            self.scanwindow_subwindow.showMaximized()
-            self.ui.mdiArea.setActiveSubWindow(self.scanwindow_subwindow)
+        # Close existing scanwindow if it exists to start a new scan
+        if self.scanwindow_subwindow is not None:
+            self.scanwindow_subwindow.close()
+            self.scanwindow_subwindow = None
+        
+        # Create new scan window with parameters
+        scan_window = ScanWindow(url=url, method=method, header_name=header_name, header_value=header_value, body=body)
+        sub_window = QMdiSubWindow()
+        sub_window.setWidget(scan_window)
+        sub_window.setWindowFlags(Qt.FramelessWindowHint)
+        self.ui.mdiArea.addSubWindow(sub_window)
+        self.scanwindow_subwindow = sub_window
+        # Connect close event to clear reference
+        sub_window.destroyed.connect(lambda: setattr(self, 'scanwindow_subwindow', None))
+        sub_window.showMaximized()
+        self.ui.mdiArea.setActiveSubWindow(sub_window)
     
     def close_settingwindow_and_show_frontwindow(self):
         """Close settingwindow and show frontwindow"""

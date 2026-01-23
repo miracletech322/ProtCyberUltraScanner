@@ -85,7 +85,27 @@ class FrontWindow(QWidget):
     def on_scan_clicked(self):
         """Handle scan button click - show ScanWindow in MDI area"""
         if self.main_window:
-            self.main_window.show_scanwindow()
+            # Check which toggle is selected
+            if self.ui.btnURL.isChecked():
+                # URL mode: pass only the URL
+                url = self.ui.edtURL.text().strip()
+                if url:
+                    self.main_window.show_scanwindow(url=url)
+            elif self.ui.btnHTTP.isChecked():
+                # HTTP mode: pass all HTTP parameters
+                url = self.ui.edtURL.text().strip()
+                method = self.ui.cmbRequest.currentText()
+                header_name = self.ui.cmbHeader.currentText()
+                header_value = self.ui.edtHeader.text().strip()
+                body = self.ui.edtBody.toPlainText()
+                if url:
+                    self.main_window.show_scanwindow(
+                        url=url,
+                        method=method,
+                        header_name=header_name,
+                        header_value=header_value,
+                        body=body
+                    )
     
     def setup_input_focus(self):
         """Setup focus handling for input field to update widgetInput border"""
