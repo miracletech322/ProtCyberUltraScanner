@@ -71,6 +71,7 @@ class MainWindow(QMainWindow):
         
         # Create new scan window with parameters
         scan_window = ScanWindow(url=url, method=method, header_name=header_name, header_value=header_value, body=body)
+        scan_window.main_window = self  # Pass reference to MainWindow
         sub_window = QMdiSubWindow()
         sub_window.setWidget(scan_window)
         sub_window.setWindowFlags(Qt.FramelessWindowHint)

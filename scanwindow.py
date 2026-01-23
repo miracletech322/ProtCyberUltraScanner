@@ -1,8 +1,9 @@
 import json
 import time
+import os
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
-from PySide6.QtWidgets import QWidget, QTreeWidgetItem
+from PySide6.QtWidgets import QWidget, QTreeWidgetItem, QFileDialog, QMessageBox
 from PySide6.QtCore import QThread, Signal, Qt
 from PySide6.QtGui import QIcon
 from ui_scanwindow import Ui_ScanWindow
@@ -34,6 +35,7 @@ class ScanWorker(QThread):
         self.body = body
         self.settings = settings or {}
         self.is_running = True
+        self.is_paused = False
         self.start_time = None
         self.request_count = 0
         
@@ -181,6 +183,12 @@ class ScanWorker(QThread):
                 total_urls = len(urls_to_test)
                 
                 for idx, test_url in enumerate(urls_to_test[:20]):  # Limit to 20 URLs for performance
+                    if not self.is_running:
+                        break
+                    
+                    # Check if paused (wait while paused)
+                    while self.is_paused and self.is_running:
+                        time.sleep(0.1)
                     if not self.is_running:
                         break
                     
@@ -345,13 +353,26 @@ class ScanWindow(QWidget):
         self.scan_worker = None
         self.issues = []
         self.issue_groups = {}
+        self.scan_results = None
+        self.is_paused = False
+        self.is_stopped = False
+        self.main_window = None  # Will be set by MainWindow
         
         # Setup tree widget
         self.ui.treeWidget.setHeaderLabel("Found Issues")
         self.ui.treeWidget.itemSelectionChanged.connect(self.on_issue_selected)
         
+        # Setup buttons
+        self.setup_buttons()
+        
         # Load settings and start scan
         self.load_settings_and_scan()
+    
+    def setup_buttons(self):
+        """Setup button click handlers"""
+        self.ui.pushButton.clicked.connect(self.on_report_clicked)  # Report button
+        self.ui.pushButton_2.clicked.connect(self.on_pause_clicked)  # Pause button
+        self.ui.pushButton_3.clicked.connect(self.on_stop_clicked)  # Stop/New button
     
     def load_settings_and_scan(self):
         """Load settings.json and start the scan"""
@@ -491,6 +512,9 @@ class ScanWindow(QWidget):
     
     def on_scan_complete(self, results):
         """Handle scan completion"""
+        # Store results for export
+        self.scan_results = results
+        
         # Update UI with results
         self.ui.labelTarget.setText(results.get("target", ""))
         self.ui.labelRisk.setText(results.get("risk", "0/5"))
@@ -505,3 +529,97 @@ class ScanWindow(QWidget):
         
         # Expand all items
         self.ui.treeWidget.expandAll()
+    
+    def on_report_clicked(self):
+        """Handle Report button click - export JSON file"""
+        if not self.scan_results:
+            QMessageBox.warning(self, "No Results", "Scan has not completed yet. Please wait for the scan to finish.")
+            return
+        
+        # Get save file path
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Report",
+            f"scan_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+            "JSON Files (*.json);;All Files (*)"
+        )
+        
+        if file_path:
+            try:
+                # Prepare export data
+                export_data = {
+                    "scan_info": {
+                        "target": self.scan_results.get("target", ""),
+                        "risk_level": self.scan_results.get("risk", "0/5"),
+                        "total_issues": len(self.scan_results.get("issues", [])),
+                        "duration_seconds": self.scan_results.get("duration", 0),
+                        "total_requests": self.scan_results.get("requests", 0),
+                        "scan_date": datetime.now().isoformat()
+                    },
+                    "issues": self.scan_results.get("issues", []),
+                    "issue_summary": {}
+                }
+                
+                # Create issue summary by severity
+                for issue in self.scan_results.get("issues", []):
+                    severity = issue.get("severity", "Unknown")
+                    if severity not in export_data["issue_summary"]:
+                        export_data["issue_summary"][severity] = 0
+                    export_data["issue_summary"][severity] += 1
+                
+                # Write JSON file
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    json.dump(export_data, f, indent=4, ensure_ascii=False)
+                
+                QMessageBox.information(self, "Export Successful", f"Report exported successfully to:\n{file_path}")
+            except Exception as e:
+                QMessageBox.critical(self, "Export Error", f"Failed to export report:\n{str(e)}")
+    
+    def on_pause_clicked(self):
+        """Handle Pause button click - pause/resume scan"""
+        if self.is_stopped:
+            return
+        
+        if self.is_paused:
+            # Resume scan
+            self.is_paused = False
+            self.ui.pushButton_2.setText("Pause")
+            if self.scan_worker:
+                self.scan_worker.is_paused = False
+            self.ui.labelLastRequest.setText("Scan resumed...")
+        else:
+            # Pause scan
+            self.is_paused = True
+            self.ui.pushButton_2.setText("Resume")
+            if self.scan_worker:
+                self.scan_worker.is_paused = True
+            self.ui.labelLastRequest.setText("Scan paused...")
+    
+    def on_stop_clicked(self):
+        """Handle Stop/New button click"""
+        if not self.is_stopped:
+            # Stop the scan
+            self.is_stopped = True
+            self.is_paused = False
+            self.ui.pushButton_2.setEnabled(False)  # Disable pause button
+            
+            if self.scan_worker:
+                self.scan_worker.is_running = False
+                self.scan_worker.is_paused = False
+                self.scan_worker.terminate()
+                self.scan_worker.wait(3000)  # Wait up to 3 seconds
+            
+            # Change button text to "New"
+            self.ui.pushButton_3.setText("New")
+            self.ui.labelLastRequest.setText("Scan stopped")
+        else:
+            # Close scanwindow and show frontwindow
+            if self.main_window:
+                if self.main_window.scanwindow_subwindow:
+                    self.main_window.scanwindow_subwindow.close()
+                    self.main_window.scanwindow_subwindow = None
+                
+                # Show frontwindow
+                if self.main_window.frontwindow_subwindow:
+                    self.main_window.frontwindow_subwindow.showMaximized()
+                    self.main_window.ui.mdiArea.setActiveSubWindow(self.main_window.frontwindow_subwindow)
