@@ -1,7 +1,7 @@
 import json
 import os
 from PySide6.QtCore import QFile, QTextStream
-from PySide6.QtWidgets import QWidget, QMessageBox, QTableWidgetItem, QAbstractItemView
+from PySide6.QtWidgets import QWidget, QMessageBox, QTableWidgetItem, QAbstractItemView, QHBoxLayout, QLabel, QComboBox
 from ui_settingwindow import Ui_SettingWindow
 
 class SettingWindow(QWidget):
@@ -33,11 +33,47 @@ class SettingWindow(QWidget):
         self.setup_test_vectors_settings_save()
         self.setup_technologies_table()
         self.setup_test_profiles()
+        self.setup_search_engine_selector()
         # Create default settings.json if it doesn't exist
         if not os.path.exists(self.settings_file):
             self.create_default_settings()
         self.load_settings()
         self.load_stylesheet()
+
+    def setup_search_engine_selector(self):
+        """Add a SearchEngine selector to the Tests tab (Option B)."""
+        # UI is generated, so we add this row dynamically.
+        # It will appear under the existing Test Profile row.
+        self.ui.labelSearchEngine = QLabel(self.ui.tabTests)
+        self.ui.labelSearchEngine.setText("Search engine")
+
+        self.ui.cmbSearchEngine = QComboBox(self.ui.tabTests)
+        self.ui.cmbSearchEngine.setObjectName("cmbSearchEngine")
+        self.ui.cmbSearchEngine.addItems([
+            "All Engines (Priority Order)",
+        ])
+        self.ui.cmbSearchEngine.setEnabled(False)
+
+        row = QHBoxLayout()
+        row.addWidget(self.ui.labelSearchEngine)
+        row.addWidget(self.ui.cmbSearchEngine)
+
+        # Insert right after the existing profile row if possible
+        try:
+            self.ui.verticalLayout_30.insertLayout(1, row)
+        except Exception:
+            self.ui.verticalLayout_30.addLayout(row)
+
+        self.ui.cmbSearchEngine.currentIndexChanged.connect(self.save_search_engine_settings)
+
+    def save_search_engine_settings(self):
+        """Persist selected SearchEngine mode into settings.json."""
+        if self._loading_settings:
+            return
+
+        settings = self.load_all_settings()
+        settings["search_engine"] = {"engine": "all"}
+        self.save_all_settings(settings)
     
     def setup_toggle_buttons(self):
         """Configure navigation buttons as toggle buttons"""
@@ -875,6 +911,17 @@ class SettingWindow(QWidget):
         self._loading_settings = True
         settings = self.load_all_settings()
         
+        # Load search engine selection (Option B)
+        try:
+            engine = settings.get("search_engine", {}).get("engine", "all")
+            if hasattr(self.ui, "cmbSearchEngine"):
+                label = "All Engines (Priority Order)"
+                idx = self.ui.cmbSearchEngine.findText(label)
+                if idx >= 0:
+                    self.ui.cmbSearchEngine.setCurrentIndex(idx)
+        except Exception:
+            pass
+        
         # Load proxy settings
         if "proxy" in settings:
             proxy_settings = settings["proxy"]
@@ -1088,6 +1135,9 @@ class SettingWindow(QWidget):
     def create_default_settings(self):
         """Create default settings.json file with all default values"""
         default_settings = {
+            "search_engine": {
+                "engine": "all"
+            },
             "proxy": {
                 "type": "system",
                 "ip": "",

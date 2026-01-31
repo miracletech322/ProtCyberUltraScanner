@@ -1,0 +1,48 @@
+{
+  "target_url": "https://www.transavia.com/",
+  "engines": [
+    {
+      "name": "SmartCrawlerPro",
+      "issues": 4,
+      "requests": 1,
+      "duration": 17.667648792266846,
+      "error": null
+    },
+    {
+      "name": "AdvancedJavaScriptAnalyzer",
+      "issues": 1,
+      "requests": 0,
+      "duration": 0.0,
+      "error": null
+    },
+    {
+      "name": "AdvancedAPISecurityAnalyzer",
+      "issues": 96,
+      "requests": 47,
+      "duration": 0.0,
+      "error": null
+    },
+    {
+      "name": "AdvancedAuthSessionAnalyzer",
+      "issues": 0,
+      "requests": 0,
+      "duration": 0.0,
+      "error": null
+    },
+    {
+      "name": "AdvancedSubdomainDiscovery",
+      "issues": 0,
+      "requests": 6,
+      "duration": 248.83759140968323,
+      "error": null
+    },
+    {
+      "name": "AdvancedInfrastructureIntelligence",
+      "issues": 0,
+      "requests": 0,
+      "duration": 0.0,
+      "error": null
+    }
+  ],
+  "error": "AdvancedInfrastructureIntelligence: 'AdvancedWAFBypassEngine' object has no attribute '_apply_chunked_encoding'"
+}
