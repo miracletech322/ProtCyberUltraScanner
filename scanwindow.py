@@ -18,7 +18,7 @@ except ImportError:
         def __init__(self, *args, **kwargs):
             pass
 
-from scanner_engine import WebCrawler, VulnerabilityScanner
+from search_engine_adapter import run_all_search_engines
 
 class ScanWorker(QThread):
     """Worker thread for performing security scans"""
@@ -45,258 +45,31 @@ class ScanWorker(QThread):
         issues = []
         
         try:
-            # Load settings
-            http_settings = self.settings.get("http", {})
-            timeout = http_settings.get("timeout", 60)
-            user_agent = http_settings.get("user_agent", "Mozilla/5.0")
-            parallel = http_settings.get("parallel", 4)
-            
-            # Setup proxy
-            proxy_settings = self.settings.get("proxy", {})
-            proxies = None
-            if proxy_settings.get("type") == "http" and proxy_settings.get("ip"):
-                proxy_url = f"http://{proxy_settings.get('ip')}:{proxy_settings.get('port', 8080)}"
-                if proxy_settings.get("username"):
-                    proxy_url = f"http://{proxy_settings.get('username')}:{proxy_settings.get('password', '')}@{proxy_settings.get('ip')}:{proxy_settings.get('port', 8080)}"
-                proxies = {"http": proxy_url, "https": proxy_url}
-            elif proxy_settings.get("type") == "socks" and proxy_settings.get("ip"):
-                proxy_url = f"socks5://{proxy_settings.get('ip')}:{proxy_settings.get('port', 1080)}"
-                proxies = {"http": proxy_url, "https": proxy_url}
-            
-            # Setup session with retries
-            session = requests.Session()
-            retry_strategy = Retry(
-                total=3,
-                backoff_factor=0.3,
-                status_forcelist=[429, 500, 502, 503, 504]
+            # Execute all SearchEngine modules in priority order
+            self.status_update.emit(f"Scanning {self.url} with all SearchEngine modules...")
+            result = run_all_search_engines(
+                target_url=self.url,
+                settings=self.settings,
+                headers=self.headers,
+                body=self.body,
+                progress_cb=self.progress.emit,
+                status_cb=self.status_update.emit,
             )
-            adapter = HTTPAdapter(max_retries=retry_strategy)
-            session.mount("http://", adapter)
-            session.mount("https://", adapter)
-            
-            # Setup authentication
-            auth_settings = self.settings.get("authentication", {})
-            auth = None
-            if auth_settings.get("http_enabled"):
-                username = auth_settings.get("username", "")
-                password = auth_settings.get("password", "")
-                if username:
-                    auth = HTTPBasicAuth(username, password)
-            
-            # Prepare headers
-            request_headers = {
-                "User-Agent": user_agent
-            }
-            request_headers.update(self.headers)
-            
-            # Add additional headers from settings
-            additional_http = http_settings.get("additional_http", "")
-            if additional_http:
-                for line in additional_http.split("\n"):
-                    if ":" in line:
-                        key, value = line.split(":", 1)
-                        request_headers[key.strip()] = value.strip()
-            
-            # Add cookies from settings
-            additional_cookies = http_settings.get("additional_cookies", "")
-            if additional_cookies:
-                for cookie in additional_cookies.split(";"):
-                    if "=" in cookie:
-                        key, value = cookie.split("=", 1)
-                        session.cookies.set(key.strip(), value.strip())
-            
-            session.headers.update(request_headers)
-            if proxies:
-                session.proxies.update(proxies)
-            
-            # Initialize vulnerability scanner
-            scanner = VulnerabilityScanner(
-                self.settings,
-                session,
-                self.issue_found.emit,
-                self.progress.emit,
-                self.status_update.emit
-            )
-            
-            # Step 1: Initial request and passive checks
-            self.status_update.emit(f"Scanning {self.url}...")
-            self.request_count += 1
-            self.progress.emit(5)
-            
-            try:
-                if self.method.upper() == "GET":
-                    response = session.get(self.url, auth=auth, timeout=timeout, allow_redirects=True)
-                elif self.method.upper() == "POST":
-                    response = session.post(self.url, auth=auth, data=self.body, timeout=timeout, allow_redirects=True)
-                elif self.method.upper() == "PUT":
-                    response = session.put(self.url, auth=auth, data=self.body, timeout=timeout, allow_redirects=True)
-                elif self.method.upper() == "PATCH":
-                    response = session.patch(self.url, auth=auth, data=self.body, timeout=timeout, allow_redirects=True)
-                elif self.method.upper() == "DELETE":
-                    response = session.delete(self.url, auth=auth, timeout=timeout, allow_redirects=True)
-                elif self.method.upper() == "HEAD":
-                    response = session.head(self.url, auth=auth, timeout=timeout, allow_redirects=True)
-                else:
-                    response = session.get(self.url, auth=auth, timeout=timeout, allow_redirects=True)
-                
-                self.request_count += 1
-                self.progress.emit(10)
-                
-                # Passive checks on initial URL
-                self.status_update.emit("Running passive security checks...")
-                passive_issues = []
-                passive_issues.extend(scanner.test_web_server_info(self.url))
-                passive_issues.extend(scanner.test_security_headers(self.url))
-                passive_issues.extend(scanner.test_robots_txt(self.url))
-                passive_issues.extend(scanner.test_sitemap(self.url))
-                passive_issues.extend(scanner.test_cms_detection(self.url))
-                passive_issues.extend(scanner.test_sensitive_data_disclosure(self.url))
-                passive_issues.extend(scanner.test_directory_listing(self.url))
-                
-                for issue in passive_issues:
-                    issues.append(issue)
-                    self.issue_found.emit(issue)
-                
-                self.progress.emit(20)
-                
-                # Step 2: Web crawling (if enabled)
-                crawler_settings = self.settings.get("crawler", {})
-                urls_to_test = [self.url]
-                
-                if crawler_settings.get("evaluate_enabled", True):
-                    self.status_update.emit("Crawling website...")
-                    crawler = WebCrawler(
-                        self.url,
-                        self.settings,
-                        session,
-                        self.issue_found.emit,
-                        self.progress.emit,
-                        self.status_update.emit
-                    )
-                    discovered_urls = crawler.crawl()
-                    urls_to_test.extend(discovered_urls[:50])  # Limit to 50 URLs for performance
-                    self.request_count += len(discovered_urls)
-                    self.progress.emit(40)
-                
-                # Step 3: Active vulnerability testing
-                self.status_update.emit("Testing for vulnerabilities...")
-                total_urls = len(urls_to_test)
-                
-                for idx, test_url in enumerate(urls_to_test[:20]):  # Limit to 20 URLs for performance
-                    if not self.is_running:
-                        break
-                    
-                    # Check if paused (wait while paused)
-                    while self.is_paused and self.is_running:
-                        time.sleep(0.1)
-                    if not self.is_running:
-                        break
-                    
-                    try:
-                        # Parse URL for parameters
-                        parsed = urlparse(test_url)
-                        params = parse_qs(parsed.query)
-                        # Convert list values to single values
-                        params = {k: v[0] if v else "" for k, v in params.items()}
-                        
-                        # Determine method
-                        test_method = self.method if test_url == self.url else "GET"
-                        
-                        # Test SQL Injection
-                        sql_issues = scanner.test_sql_injection(test_url, params, test_method)
-                        for issue in sql_issues:
-                            issues.append(issue)
-                            self.issue_found.emit(issue)
-                        
-                        # Test Blind SQL Injection
-                        blind_sql_issues = scanner.test_blind_sql_injection(test_url, params, test_method)
-                        for issue in blind_sql_issues:
-                            issues.append(issue)
-                            self.issue_found.emit(issue)
-                        
-                        # Test XSS
-                        xss_issues = scanner.test_xss(test_url, params, test_method)
-                        for issue in xss_issues:
-                            issues.append(issue)
-                            self.issue_found.emit(issue)
-                        
-                        # Test Path Traversal
-                        path_traversal_issues = scanner.test_path_traversal(test_url, params, test_method)
-                        for issue in path_traversal_issues:
-                            issues.append(issue)
-                            self.issue_found.emit(issue)
-                        
-                        # Test Command Injection
-                        cmd_issues = scanner.test_command_injection(test_url, params, test_method)
-                        for issue in cmd_issues:
-                            issues.append(issue)
-                            self.issue_found.emit(issue)
-                        
-                        # Test Open Redirect
-                        redirect_issues = scanner.test_open_redirect(test_url, params, test_method)
-                        for issue in redirect_issues:
-                            issues.append(issue)
-                            self.issue_found.emit(issue)
-                        
-                        # Test SSRF
-                        ssrf_issues = scanner.test_ssrf(test_url, params, test_method)
-                        for issue in ssrf_issues:
-                            issues.append(issue)
-                            self.issue_found.emit(issue)
-                        
-                        # Test File Inclusion
-                        file_inclusion_issues = scanner.test_file_inclusion(test_url, params, test_method)
-                        for issue in file_inclusion_issues:
-                            issues.append(issue)
-                            self.issue_found.emit(issue)
-                        
-                        self.request_count += len(params) * 7  # Approximate request count
-                        progress_value = 40 + int((idx + 1) / min(20, total_urls) * 50)
-                        self.progress.emit(progress_value)
-                        
-                    except Exception as e:
-                        continue
-                
-                # Step 4: SSL/TLS and Brute Force tests
-                self.status_update.emit("Testing SSL/TLS and authentication...")
-                ssl_issues = scanner.test_ssl_tls(self.url)
-                for issue in ssl_issues:
-                    issues.append(issue)
-                    self.issue_found.emit(issue)
-                
-                brute_force_issues = scanner.test_brute_force(self.url)
-                for issue in brute_force_issues:
-                    issues.append(issue)
-                    self.issue_found.emit(issue)
-                
-                self.progress.emit(95)
-                
-            except requests.exceptions.RequestException as e:
-                issues.append({
-                    "title": "Connection Error",
-                    "severity": "High",
-                    "url": self.url,
-                    "description": f"Failed to connect to target: {str(e)}",
-                    "request": f"{self.method} {self.url}",
-                    "response": None
-                })
-                self.issue_found.emit(issues[-1])
-            
-            # Calculate duration
-            duration = time.time() - self.start_time
-            
-            # Prepare scan results
-            risk_level = self.calculate_risk_level(issues)
-            
+
+            issues.extend(result.issues)
+            for issue in result.issues:
+                self.issue_found.emit(issue)
+
             results = {
-                "target": self.url,
-                "risk": risk_level,
-                "issues": issues,
-                "duration": duration,
-                "requests": self.request_count
+                "target": result.target,
+                "risk": result.risk,
+                "issues": result.issues,
+                "duration": result.duration,
+                "requests": result.requests,
+                # Keep raw results for debugging/export if needed later
+                "raw": result.raw,
             }
-            
-            self.progress.emit(100)
+
             self.scan_complete.emit(results)
             
         except Exception as e:
@@ -481,34 +254,86 @@ class ScanWindow(QWidget):
             issue_data = item.data(0, Qt.UserRole)
             
             if isinstance(issue_data, dict):
-                # Display issue details
-                details = []
-                details.append(f"Severity: {issue_data.get('severity', 'Unknown')}")
-                details.append(f"\nURL: {issue_data.get('url', '')}")
-                details.append(f"\nDESCRIPTION")
-                details.append(issue_data.get('description', ''))
-                details.append(f"\n\nRequest:")
-                details.append(issue_data.get('request', ''))
-                details.append(f"\n\nResponse:")
-                details.append(issue_data.get('response', ''))
-                
-                self.ui.plainTextEdit.setPlainText("\n".join(details))
+                self.ui.plainTextEdit.setPlainText(self.format_issue_details(issue_data))
             elif isinstance(issue_data, str):
                 # Parent item selected - show first issue from group
                 title = issue_data
                 if title in self.issue_groups and self.issue_groups[title]["issues"]:
                     first_issue = self.issue_groups[title]["issues"][0]
-                    details = []
-                    details.append(f"Severity: {first_issue.get('severity', 'Unknown')}")
-                    details.append(f"\nURL: {first_issue.get('url', '')}")
-                    details.append(f"\nDESCRIPTION")
-                    details.append(first_issue.get('description', ''))
-                    details.append(f"\n\nRequest:")
-                    details.append(first_issue.get('request', ''))
-                    details.append(f"\n\nResponse:")
-                    details.append(first_issue.get('response', ''))
-                    
-                    self.ui.plainTextEdit.setPlainText("\n".join(details))
+                    self.ui.plainTextEdit.setPlainText(self.format_issue_details(first_issue))
+
+    def format_issue_details(self, issue_data):
+        """Format issue details in a model-app-like structure."""
+        details = []
+        details.append(f"Severity: {issue_data.get('severity', 'Unknown')}")
+        details.append(f"URL: {issue_data.get('url', '')}")
+
+        description = issue_data.get('description', '')
+        if description:
+            details.append("\nDESCRIPTION")
+            details.append(description)
+
+        recommendation = issue_data.get("recommendation", "")
+        if recommendation:
+            details.append("\nRECOMMENDATION")
+            details.append(recommendation)
+
+        classification = issue_data.get("classification", {})
+        if isinstance(classification, dict) and classification:
+            details.append("\nCLASSIFICATIONS")
+            for key, values in classification.items():
+                if isinstance(values, list):
+                    details.append(f"{key}: {', '.join(values)}")
+                else:
+                    details.append(f"{key}: {values}")
+
+        references = issue_data.get("references", [])
+        if references:
+            details.append("\nREFERENCES")
+            for ref in references:
+                if isinstance(ref, dict):
+                    title = ref.get("title", "")
+                    url = ref.get("url", "")
+                    details.append(f"- {title}: {url}".strip())
+                else:
+                    details.append(f"- {ref}")
+
+        custom_fields = issue_data.get("customFields", {})
+        if isinstance(custom_fields, dict) and custom_fields:
+            details.append("\nCUSTOM FIELDS")
+            for key, values in custom_fields.items():
+                if isinstance(values, list):
+                    details.append(f"{key}:")
+                    for v in values[:50]:
+                        details.append(f"  - {v}")
+                    if len(values) > 50:
+                        details.append(f"  ... ({len(values) - 50} more)")
+                else:
+                    details.append(f"{key}: {values}")
+
+        http_pairs = issue_data.get("http", [])
+        if http_pairs:
+            details.append("\nREQUEST / RESPONSE")
+            for pair in http_pairs[:3]:
+                if isinstance(pair, dict):
+                    req = pair.get("request", "")
+                    resp = pair.get("response", "")
+                    if req:
+                        details.append(req)
+                    if resp:
+                        details.append(resp)
+                    details.append("")
+
+        request = issue_data.get('request', '')
+        response = issue_data.get('response', '')
+        if request or response:
+            details.append("\nREQUEST / RESPONSE")
+            if request:
+                details.append(request)
+            if response:
+                details.append(response)
+
+        return "\n".join(details)
     
     def on_scan_complete(self, results):
         """Handle scan completion"""
@@ -546,26 +371,17 @@ class ScanWindow(QWidget):
         
         if file_path:
             try:
-                # Prepare export data
+                # Prepare export data in model-app format
+                duration_seconds = float(self.scan_results.get("duration", 0) or 0.0)
+                minutes = int(duration_seconds // 60)
+                seconds = int(duration_seconds % 60)
+                duration_str = f"{minutes}′ {seconds}″"
+
                 export_data = {
-                    "scan_info": {
-                        "target": self.scan_results.get("target", ""),
-                        "risk_level": self.scan_results.get("risk", "0/5"),
-                        "total_issues": len(self.scan_results.get("issues", [])),
-                        "duration_seconds": self.scan_results.get("duration", 0),
-                        "total_requests": self.scan_results.get("requests", 0),
-                        "scan_date": datetime.now().isoformat()
-                    },
+                    "date": datetime.now().strftime("%a %b %d %Y"),
+                    "duration": duration_str,
                     "issues": self.scan_results.get("issues", []),
-                    "issue_summary": {}
                 }
-                
-                # Create issue summary by severity
-                for issue in self.scan_results.get("issues", []):
-                    severity = issue.get("severity", "Unknown")
-                    if severity not in export_data["issue_summary"]:
-                        export_data["issue_summary"][severity] = 0
-                    export_data["issue_summary"][severity] += 1
                 
                 # Write JSON file
                 with open(file_path, 'w', encoding='utf-8') as f:
