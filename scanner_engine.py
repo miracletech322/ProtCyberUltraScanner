@@ -66,6 +66,7 @@ class WebCrawler:
         self.visited_urls = set()
         self.urls_to_visit = [(base_url, 0)]  # (url, depth)
         self.discovered_urls = []
+        self.discovered_forms = []
         self.base_domain = urlparse(base_url).netloc
         
     def should_exclude_url(self, url):
@@ -142,6 +143,12 @@ class WebCrawler:
                         if parsed_link.netloc == self.base_domain or (self.scan_subdomain and parsed_link.netloc.endswith(self.base_domain.split('.', 1)[-1])):
                             if absolute_url not in self.visited_urls and depth < self.max_depth:
                                 self.urls_to_visit.append((absolute_url, depth + 1))
+
+                    # Capture discovered forms with absolute action URLs
+                    for form in parser.forms:
+                        action = form.get('action') or normalized_url
+                        form['action'] = urljoin(normalized_url, action)
+                        self.discovered_forms.append(form)
                 
             except Exception as e:
                 pass  # Continue crawling
@@ -1018,4 +1025,138 @@ class VulnerabilityScanner:
     def _format_headers(self, headers):
         """Format response headers"""
         return "\n".join([f"{k}: {v}" for k, v in headers.items()])
+
+
+def _build_session(settings):
+    session = requests.Session()
+    http_settings = settings.get("http", {})
+    retries = Retry(total=2, backoff_factor=0.2, status_forcelist=[429, 500, 502, 503, 504])
+    adapter = HTTPAdapter(max_retries=retries)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+
+    if http_settings.get("user_agent"):
+        session.headers["User-Agent"] = http_settings.get("user_agent")
+    if http_settings.get("additional_http"):
+        for line in http_settings.get("additional_http", "").splitlines():
+            if ":" in line:
+                key, value = line.split(":", 1)
+                session.headers[key.strip()] = value.strip()
+
+    proxy_settings = settings.get("proxy", {})
+    if proxy_settings.get("type") in {"http", "socks"} and proxy_settings.get("ip"):
+        scheme = "socks5" if proxy_settings.get("type") == "socks" else "http"
+        auth = ""
+        if proxy_settings.get("username"):
+            auth = f"{proxy_settings.get('username')}:{proxy_settings.get('password', '')}@"
+        proxy_url = f"{scheme}://{auth}{proxy_settings.get('ip')}:{proxy_settings.get('port', 8080)}"
+        session.proxies.update({"http": proxy_url, "https": proxy_url})
+
+    auth_settings = settings.get("authentication", {})
+    if auth_settings.get("http_enabled") and auth_settings.get("username"):
+        session.auth = HTTPBasicAuth(auth_settings.get("username"), auth_settings.get("password", ""))
+
+    return session
+
+
+def _default_value_for_input(name: str, form_inputs: dict) -> str:
+    if not name:
+        return ""
+    key = name.lower()
+    if "email" in key:
+        return form_inputs.get("email", "test@example.com")
+    if "user" in key or "login" in key:
+        return form_inputs.get("username", "testuser")
+    if "pass" in key:
+        return form_inputs.get("password", "P@ssw0rd!")
+    if "first" in key:
+        return form_inputs.get("first_name", "Test")
+    if "last" in key:
+        return form_inputs.get("last_name", "User")
+    if "phone" in key:
+        return form_inputs.get("phone", "0000000000")
+    return "test"
+
+
+def run_blackbox_scan(
+    target_url,
+    settings,
+    issue_callback=None,
+    progress_callback=None,
+    status_callback=None,
+):
+    """Run crawler + vulnerability scanner with settings."""
+    start_time = time.time()
+    session = _build_session(settings)
+    crawler = WebCrawler(
+        base_url=target_url,
+        settings=settings,
+        session=session,
+        issue_callback=issue_callback,
+        progress_callback=progress_callback,
+        status_callback=status_callback,
+    )
+    discovered_urls = crawler.crawl()
+    forms = crawler.discovered_forms
+
+    scanner = VulnerabilityScanner(
+        settings=settings,
+        session=session,
+        issue_callback=issue_callback,
+        progress_callback=progress_callback,
+        status_callback=status_callback,
+    )
+
+    issues = []
+    total = max(len(discovered_urls), 1)
+    form_inputs = settings.get("form_inputs", {})
+
+    for idx, url in enumerate(discovered_urls):
+        parsed = urlparse(url)
+        params = parse_qs(parsed.query)
+        simple_params = {k: (v[0] if isinstance(v, list) and v else "") for k, v in params.items()}
+
+        issues.extend(scanner.test_sql_injection(url, simple_params, method="GET"))
+        issues.extend(scanner.test_blind_sql_injection(url, simple_params, method="GET"))
+        issues.extend(scanner.test_xss(url, simple_params, method="GET"))
+        issues.extend(scanner.test_path_traversal(url, simple_params, method="GET"))
+        issues.extend(scanner.test_command_injection(url, simple_params, method="GET"))
+        issues.extend(scanner.test_open_redirect(url, simple_params, method="GET"))
+        issues.extend(scanner.test_ssrf(url, simple_params, method="GET"))
+        issues.extend(scanner.test_file_inclusion(url, simple_params, method="GET"))
+
+        if progress_callback:
+            progress_callback(int((idx + 1) / total * 100))
+
+    for form in forms:
+        action = form.get("action") or target_url
+        method = form.get("method", "GET").upper()
+        params = {}
+        for inp in form.get("inputs", []):
+            name = inp.get("name", "")
+            params[name] = inp.get("value") or _default_value_for_input(name, form_inputs)
+        issues.extend(scanner.test_sql_injection(action, params, method=method))
+        issues.extend(scanner.test_blind_sql_injection(action, params, method=method))
+        issues.extend(scanner.test_xss(action, params, method=method))
+        issues.extend(scanner.test_path_traversal(action, params, method=method))
+        issues.extend(scanner.test_command_injection(action, params, method=method))
+
+    # Passive checks on target root
+    issues.extend(scanner.test_sensitive_data_disclosure(target_url))
+    issues.extend(scanner.test_directory_listing(target_url))
+    issues.extend(scanner.test_robots_txt(target_url))
+    issues.extend(scanner.test_sitemap(target_url))
+    issues.extend(scanner.test_web_server_info(target_url))
+    issues.extend(scanner.test_security_headers(target_url))
+    issues.extend(scanner.test_cms_detection(target_url))
+    issues.extend(scanner.test_ssl_tls(target_url))
+    issues.extend(scanner.test_brute_force(target_url))
+
+    return {
+        "target": target_url,
+        "issues": issues,
+        "urls_crawled": len(discovered_urls),
+        "forms_found": len(forms),
+        "duration": time.time() - start_time,
+    }
 
